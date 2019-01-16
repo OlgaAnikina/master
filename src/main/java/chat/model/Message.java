@@ -1,4 +1,4 @@
-package chat.domain;
+package chat.model;
 
 import javax.persistence.*;
 
@@ -36,6 +36,6 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message{ id = "  + " text: " + text + " }";
+        return "Message{ id = " + " text: " + text + " }";
     }
 }
