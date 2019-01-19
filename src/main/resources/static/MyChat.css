@@ -1,0 +1,48 @@
+body{
+    text-align: center;
+    background: azure;
+    font-family: Helvetica, sans-serif;
+    font-size: 18px;
+    color: black;
+}
+
+.button {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 25px;
+    text-align: center;
+    font:13pt "Bold Italic Art", "Bold Italic Art", sans-serif;
+    margin: 20px;
+    background: #befdfd;
+}
+
+tr td:first-child {
+    padding-right: 20px;
+    text-align: left;
+}
+
+td {
+    border: 1px solid;
+    text-align: left;
+}
+tr:nth-child(2n + 1) {
+    text-align: left;
+}
+
+tr:nth-child(2n) {
+    background:  #befdfd;
+    text-align: right;
+}
+
+table {
+    margin: 0 auto;
+    padding-top: 10px;
+    width: 50%;
+}
+
+text {
+    width: 50px;
+}
+
+

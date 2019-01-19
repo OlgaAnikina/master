@@ -10,7 +10,7 @@ Vue.component('message-form', {
 
     template: '<div>'+
         '<input type="text" placeholder="Text of message" v-model="text"/>' +
-        '<input type="button" value="Save" @click="save"/>' +
+        '<input type="button" :class="{button:true}" value="Save" @click="save" />' +
         '</div>',
     methods: {
         save: function () {
@@ -26,15 +26,15 @@ Vue.component('message-form', {
 
 Vue.component('message-row', {
     props: ['message'],
-    template: '<div><i>({{message.id}})</i>{{message.text}}</div>'
+    template: '<tr><th>{{message.text}}</th></tr>'
 });
 
 Vue.component('messages-list', {
     props: ['messages'],
-    template: '<div>' +
+    template: '<table>' +
         '<message-form :messages="messages" />' +
         '<message-row v-for="message in messages" :key="message.id" :message="message"/>' +
-        '</div>',
+        '</table>',
 
     created: function () {
         messageApi.get().then(result =>
