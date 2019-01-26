@@ -36,19 +36,22 @@ Vue.component('messages-list', {
         '<message-row v-for="message in messages" :key="message.id" :message="message"/>' +
         '</table>',
 
-    created: function () {
-        messageApi.get().then(result =>
-        result.json().then(data=>
-        data.forEach(message => this.messages.push(message))))
 
-    }
 });
 
 
 var app = new Vue({
     el: '#app',
-    template: '<messages-list :messages="messages"/>',
+    template: '<div>' +
+        '<div v-if="!profile">You can authorize with <a href="/login">Google</a> </div>' +
+        '<div v-else> {{profile.name}}&nbsp;<a href="/logout">Log out</a></div>' +
+        '<messages-list :messages="messages"/>' +
+        '</div>',
     data: {
-        messages: []
+        messages: frontendData.messages,
+        profile: frontendData.profile
+    },
+    created: function () {
+ 
     }
 });
