@@ -2,6 +2,7 @@ package chat.web.rest.controllers;
 
 import chat.model.MyUser;
 import chat.repositories.MessageRepository;
+import chat.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -15,10 +16,13 @@ import java.util.HashMap;
 @RequestMapping("/")
 public class MainController {
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public MainController(MessageRepository messageRepository) {
+    public MainController(MessageRepository messageRepository,
+                          UserRepository userRepository) {
         this.messageRepository = messageRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -27,6 +31,7 @@ public class MainController {
 
         data.put("profile", user);
         data.put("messages", messageRepository.findAll());
+        data.put("users", userRepository.findAll());
         model.addAttribute("frontendData", data);
         return "index";
     }

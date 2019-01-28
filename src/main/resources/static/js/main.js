@@ -39,15 +39,30 @@ Vue.component('messages-list', {
 
 });
 
+Vue.component('user-row', {
+    props: ['user'],
+    template: '<div>{{ user.name}}</div>'
+});
+
+Vue.component('users-list', {
+    props: ['users'],
+    template:
+        '<div>' +
+        '<user-row v-for="user in users"  :user="user"/>' +
+        '</div>'
+});
 
 var app = new Vue({
     el: '#app',
     template: '<div>' +
+
         '<div v-if="!profile">You can authorize with <a href="/login">Google</a> </div>' +
         '<div v-else> {{profile.name}}&nbsp;<a href="/logout">Log out</a></div>' +
         '<messages-list :messages="messages"/>' +
+        '<div><users-list :users="users" /> </div>' +
         '</div>',
     data: {
+        users: frontendData.users,
         messages: frontendData.messages,
         profile: frontendData.profile
     },

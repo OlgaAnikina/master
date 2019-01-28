@@ -11,6 +11,23 @@ public class Message {
     private Long id;
     private String text;
 
+
+  /*  @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="author")
+    private MyUser author;
+
+    public MyUser getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(MyUser author) {
+        this.author = author;
+    }
+
+    public String getAuthorName() {
+        return author !=null ? author.getName() : "<guest>";
+    }*/
+
     public Message() {
     }
 
@@ -36,6 +53,7 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message{ id = " + " text: " + text + " }";
+        return "Message{ id = " + " text: "
+                + text  +  "  }";
     }
 }

@@ -1,8 +1,7 @@
 package chat.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "myuser")
@@ -13,6 +12,18 @@ public class MyUser {
     private String userpic;
     private String email;
     private String gender;
+
+  /*  @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Message> messages;
+
+
+    public Set<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(Set<Message> messages) {
+        this.messages = messages;
+    }*/
 
     public MyUser() {}
 
