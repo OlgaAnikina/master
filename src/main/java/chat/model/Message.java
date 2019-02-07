@@ -25,7 +25,7 @@ public class Message {
     }
 
     public String getAuthorName() {
-        return author !=null ? author.getUsername() : "guest";
+        return author != null ? author.getUsername() : "guest";
     }
 
     public Message() {

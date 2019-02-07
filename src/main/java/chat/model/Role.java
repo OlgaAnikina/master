@@ -3,7 +3,7 @@ package chat.model;
 import org.springframework.security.core.GrantedAuthority;
 
 public enum Role implements GrantedAuthority {
-    USER;
+    USER, OWNER, PARTICIPANT;
 
 
     @Override

@@ -4,7 +4,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -25,6 +27,10 @@ public class MyUser implements UserDetails {
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Message> messages;
+
+  /*  @ManyToMany(mappedBy = "Owners")
+    private List<Room>  OwnerOfRooms = new ArrayList<>();
+*/
 
     public MyUser() {
     }
@@ -114,5 +120,9 @@ public class MyUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return isActive();
+    }
+
+    public void addRole(Role role) {
+        roles.add(role);
     }
 }
