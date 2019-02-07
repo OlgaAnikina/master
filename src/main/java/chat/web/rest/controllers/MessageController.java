@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("v1/messages")
 public class MessageController {
 
     @Autowired
@@ -21,18 +20,18 @@ public class MessageController {
         this.messageRepository = messageRepository;
     }
 
-    @GetMapping
+    @GetMapping("v1/messages")
     public List<Message> getAllMessages() {
         return messageRepository.findAll();
     }
 
-    @GetMapping("{id}")
+    @GetMapping("v1/messages/{id}")
     public Message getMessageById(@PathVariable("id") Message message) {
         return message;
     }
 
 
-    @PostMapping
+    @PostMapping("v1/messages")
     public Message createMessage(@RequestBody Message message,
                                 @AuthenticationPrincipal MyUser user) {
         message.setAuthor(user);

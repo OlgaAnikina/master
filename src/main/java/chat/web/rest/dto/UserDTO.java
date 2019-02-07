@@ -1,6 +1,9 @@
 package chat.web.rest.dto;
 
+import javax.annotation.Generated;
+
 public class UserDTO {
+
     private long id;
     private String name;
 

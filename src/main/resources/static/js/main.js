@@ -29,7 +29,7 @@ Vue.component('message-form', {
 Vue.component('message-row', {
     props: ['message'],
     template: '<div class="block1"><div>{{message.text}}</div>' +
-        '<div>{{message.authorName}}</div>' +
+        '<div class="author">{{message.authorName}}</div>' +
         '</div>'
 });
 
@@ -45,7 +45,7 @@ Vue.component('messages-list', {
 
 Vue.component('user-row', {
     props: ['user'],
-    template: '<div>{{ user.name}}</div>'
+    template: '<div><a href="/chat">{{ user.name}}</a></div>'
 });
 
 Vue.component('users-list', {
@@ -61,16 +61,16 @@ var app = new Vue({
     el: '#app',
     template: '<div>' +
 
-        '<div v-if="!profile">You can authorize <a href="/login">here</a> </div>' +
-        '<div v-if="!profile">or add new profile <a href="/registration">here</a> </div>' +
-        '<div v-else> <div>{{profile.name}}&nbsp;<a href="/logout">Log out</a>' +
-     //   '<div><users-list :users="users" /> </div>' +
+        '<div v-if="!profile"><h4>You can authorize</h4> <a href="/login">here</a> </div>' +
+        '<div v-if="!profile"><h4>or add new profile</h4> <a href="/registration">here</a> </div>' +
+        '<div v-else> <div>{{profile.username}}&nbsp;<a href="/logout">Log out</a>' +
+       '<div><users-list :users="users" /> </div>' +
         '</div></div>' +
         '<messages-list :messages="messages"/>' +
 
         '</div>',
     data: {
-     //   users: frontendData.users,
+        users: frontendData.users,
         messages: frontendData.messages,
         profile: frontendData.profile
     },

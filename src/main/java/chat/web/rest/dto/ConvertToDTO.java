@@ -13,7 +13,7 @@ public  class ConvertToDTO {
     @Autowired
     private UserRepository userRepository;
 
-    private  MessageDTO convertMessageToDTO(Message message) {
+    public  MessageDTO convertMessageToDTO(Message message) {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setId(message.getId());
         messageDTO.setText(message.getText());
@@ -31,9 +31,9 @@ public  class ConvertToDTO {
         return message;
     }
 
-    private UserDTO convertUserToDTO (MyUser user) {
+    public UserDTO convertUserToDTO (MyUser user) {
         UserDTO userDTO = new UserDTO();
-        userDTO.setId(user.getId());
+       userDTO.setId(user.getId());
         userDTO.setName(user.getUsername());
 
         return userDTO;
