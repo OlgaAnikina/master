@@ -33,9 +33,9 @@ public class MessageController {
 
 
     @PostMapping
-    public Message createMessage(@RequestBody Message message){
-                               // @AuthenticationPrincipal MyUser user) {
-       // message.setAuthor(user);
+    public Message createMessage(@RequestBody Message message,
+                                @AuthenticationPrincipal MyUser user) {
+        message.setAuthor(user);
         return messageRepository.save(message);
     }
 

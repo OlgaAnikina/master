@@ -1,20 +1,50 @@
 package chat.model;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Set;
 
 @Entity
 @Table(name = "myuser")
-public class MyUser {
+public class MyUser implements UserDetails {
     @Id
-    private String id;
-    private String name;
-    private String userpic;
-    private String email;
-    private String gender;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String username;
+    private String password;
+    private boolean active;
 
-  /*  @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles;
+
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Message> messages;
+
+    public MyUser() {
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public MyUser(String username, String password, boolean active, Set<Role> roles, Set<Message> messages) {
+        this.username = username;
+        this.password = password;
+        this.active = active;
+        this.roles = roles;
+        this.messages = messages;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
 
 
     public Set<Message> getMessages() {
@@ -23,54 +53,66 @@ public class MyUser {
 
     public void setMessages(Set<Message> messages) {
         this.messages = messages;
-    }*/
-
-    public MyUser() {}
-
-    public MyUser(String name, String userpic, String email, String gender) {
-        this.name = name;
-        this.userpic = userpic;
-        this.email = email;
-        this.gender = gender;
     }
 
-    public String getId() {
+
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public String getUserpic() {
-        return userpic;
+
+    public boolean isActive() {
+        return active;
     }
 
-    public void setUserpic(String userpic) {
-        this.userpic = userpic;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
-    public String getEmail() {
-        return email;
+    public String getPassword() {
+        return password;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getGender() {
-        return gender;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getRoles();
     }
 
-    public void setGender(String gender) {
-        this.gender = gender;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActive();
     }
 }
