@@ -1,15 +1,16 @@
 var messageApi = Vue.resource('/v1/messages{/id}');
+var roomApi = Vue.resource('/v2/room{/roomId}');
 
 Vue.component('message-form', {
-    props:['messages'],
-    data: function() {
+    props: ['messages'],
+    data: function () {
         return {
             text: '',
 
         }
     },
 
-    template: '<div >'+
+    template: '<div >' +
         '<input type="text" placeholder="Text of message" v-model="text"/>' +
         '<input type="button" :class="{button:true}" value="Save" @click="save" />' +
         '</div>',
@@ -18,7 +19,7 @@ Vue.component('message-form', {
             var message = {text: this.text};
 
             messageApi.save({}, message).then(result =>
-                result.json().then(data =>{
+                result.json().then(data => {
                     this.messages.push(data);
                 })
             )
@@ -29,7 +30,7 @@ Vue.component('message-form', {
 Vue.component('message-row', {
     props: ['message'],
     template: '<div class="block1"><div>{{message.text}}</div>' +
-        '<div class="author">{{message.authorName}}</div>' +
+        '<div class="author"><i>{{message.authorName}}</i></div>' +
         '</div>'
 });
 
@@ -44,8 +45,23 @@ Vue.component('messages-list', {
 });
 
 Vue.component('user-row', {
-    props: ['user'],
-    template: '<div><a href="/chat">{{ user.name}}</a></div>'
+    props: ['user', 'rooms'],
+    template: '<div id="example-2">' +
+        ' <button v-on:click="open">{{user.name}}</button>' +
+        '</div>',
+    methods: {
+        open: function (event) {
+            var room = {owner: this.owner}
+            roomApi.save({}, room).then(result =>
+                result.json().then(data => {
+                    this.rooms.push(data);
+                })
+            )
+
+        }
+    }
+
+
 });
 
 Vue.component('users-list', {
@@ -63,8 +79,8 @@ var app = new Vue({
 
         '<div v-if="!profile"><h4>You can authorize</h4> <a href="/login">here</a> </div>' +
         '<div v-if="!profile"><h4>or add new profile</h4> <a href="/registration">here</a> </div>' +
-        '<div v-else> <div>{{profile.username}}&nbsp;<a href="/logout">Log out</a>' +
-       '<div><users-list :users="users" /> </div>' +
+        '<div v-else> <div>{{profile.name}}&nbsp;<a href="/logout">Log out</a>' +
+        '<div><users-list :users="users" /> </div>' +
         '</div></div>' +
         '<messages-list :messages="messages"/>' +
 
@@ -75,6 +91,6 @@ var app = new Vue({
         profile: frontendData.profile
     },
     created: function () {
- 
+
     }
 });

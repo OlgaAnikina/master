@@ -1,10 +1,10 @@
 package chat.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -19,38 +19,36 @@ public class MyUser implements UserDetails {
     private String password;
     private boolean active;
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
-
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Message> messages;
 
-  /*  @ManyToMany(mappedBy = "Owners")
-    private List<Room>  OwnerOfRooms = new ArrayList<>();
-*/
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(name = "roomsowner",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "room_id"))
+    private List<Room> OwnerOfRooms;
+
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(name = "rooms_participants",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "room_id"))
+    private List<Room> particioants;
+
 
     public MyUser() {
     }
 
-    public Set<Role> getRoles() {
-        return roles;
-    }
 
-    public MyUser(String username, String password, boolean active, Set<Role> roles, Set<Message> messages) {
+    public MyUser(String username, String password, boolean active/*, Set<Role> roles*/, Set<Message> messages) {
         this.username = username;
         this.password = password;
         this.active = active;
-        this.roles = roles;
+      //  this.roles = roles;
         this.messages = messages;
     }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
 
 
     public Set<Message> getMessages() {
@@ -60,7 +58,6 @@ public class MyUser implements UserDetails {
     public void setMessages(Set<Message> messages) {
         this.messages = messages;
     }
-
 
 
     public Long getId() {
@@ -99,7 +96,7 @@ public class MyUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles();
+        return null;
     }
 
     @Override
@@ -122,7 +119,21 @@ public class MyUser implements UserDetails {
         return isActive();
     }
 
-    public void addRole(Role role) {
-        roles.add(role);
+
+
+    public List<Room> getOwnerOfRooms() {
+        return OwnerOfRooms;
+    }
+
+    public void setOwnerOfRooms(List<Room> ownerOfRooms) {
+        OwnerOfRooms = ownerOfRooms;
+    }
+
+    public List<Room> getParticioants() {
+        return particioants;
+    }
+
+    public void setParticioants(List<Room> particioants) {
+        this.particioants = particioants;
     }
 }

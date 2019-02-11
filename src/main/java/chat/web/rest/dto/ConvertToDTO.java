@@ -4,14 +4,21 @@ import chat.model.Message;
 import chat.model.MyUser;
 import chat.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Service
 public  class ConvertToDTO {
+
     @Autowired
     private UserRepository userRepository;
+
+    public ConvertToDTO(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public  MessageDTO convertMessageToDTO(Message message) {
         MessageDTO messageDTO = new MessageDTO();
@@ -24,16 +31,16 @@ public  class ConvertToDTO {
 
     public  Message convertMessage(MessageDTO messageDTO) {
         Message message = new Message();
-        message.setId(messageDTO.getId());
         message.setText(messageDTO.getText());
-        message.setAuthor(userRepository.findByUsername(messageDTO.getAuthorName()));
+        MyUser author = userRepository.findByUsername(messageDTO.getAuthorName());
+        message.setAuthor(author);
 
         return message;
     }
 
     public UserDTO convertUserToDTO (MyUser user) {
         UserDTO userDTO = new UserDTO();
-       userDTO.setId(user.getId());
+        userDTO.setId(user.getId());
         userDTO.setName(user.getUsername());
 
         return userDTO;

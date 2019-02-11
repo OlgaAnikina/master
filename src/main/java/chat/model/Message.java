@@ -1,5 +1,7 @@
 package chat.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -13,8 +15,12 @@ public class Message {
 
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="author")
+    @JoinColumn(name = "author")
     private MyUser author;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "room_id")
+    private Room room;
 
     public MyUser getAuthor() {
         return author;
@@ -54,6 +60,6 @@ public class Message {
     @Override
     public String toString() {
         return "Message{ id = " + " text: "
-                + text  +  "  }";
+                + text + "  }";
     }
 }
