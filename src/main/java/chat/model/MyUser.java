@@ -23,30 +23,31 @@ public class MyUser implements UserDetails {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Message> messages;
 
-    @ManyToMany
-    @JsonIgnore
-    @JoinTable(name = "roomsowner",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "room_id"))
-    private List<Room> OwnerOfRooms;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER , cascade = CascadeType.ALL)
     @JsonIgnore
     @JoinTable(name = "rooms_participants",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id"))
-    private List<Room> particioants;
+    private List<Room> participants;
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "relation")
+    private Set<Relation> relations
+
+
+
 
 
     public MyUser() {
     }
 
 
-    public MyUser(String username, String password, boolean active/*, Set<Role> roles*/, Set<Message> messages) {
+    public MyUser(String username, String password, boolean active, Set<Message> messages) {
         this.username = username;
         this.password = password;
         this.active = active;
-      //  this.roles = roles;
         this.messages = messages;
     }
 
@@ -119,21 +120,27 @@ public class MyUser implements UserDetails {
         return isActive();
     }
 
-
-
-    public List<Room> getOwnerOfRooms() {
-        return OwnerOfRooms;
+    public void addParticipants(Room room) {
+        participants.add(room);
     }
 
-    public void setOwnerOfRooms(List<Room> ownerOfRooms) {
-        OwnerOfRooms = ownerOfRooms;
+    public List<Room> getParticipants() {
+        return participants;
     }
 
-    public List<Room> getParticioants() {
-        return particioants;
+    public void setParticipants(List<Room> participants) {
+        this.participants = participants;
     }
 
-    public void setParticioants(List<Room> particioants) {
-        this.particioants = particioants;
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+    public void addRole(Role role) {
+        roles.add(role);
     }
 }

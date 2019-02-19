@@ -10,5 +10,6 @@ public class PageRegistration implements WebMvcConfigurer {
         registry.addViewController("login").setViewName("login");
         registry.addViewController("/registration").setViewName("registration");
         registry.addViewController("/").setViewName("index");
+        registry.addViewController("/createRoom").setViewName("createRoom");
     }
 }

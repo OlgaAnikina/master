@@ -57,6 +57,14 @@ public class Message {
         this.text = text;
     }
 
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
     @Override
     public String toString() {
         return "Message{ id = " + " text: "

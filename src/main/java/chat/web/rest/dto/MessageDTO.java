@@ -4,7 +4,7 @@ public class MessageDTO {
 
     private long id;
     private String text;
-  //  private UserDTO author;
+    private Long roomId;
     private String authorName;
 
     public MessageDTO() {
@@ -48,5 +48,13 @@ public class MessageDTO {
 
     public void setAuthorName(String authorName) {
         this.authorName = authorName;
+    }
+
+    public Long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
     }
 }

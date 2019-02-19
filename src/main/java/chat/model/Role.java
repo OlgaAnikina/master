@@ -2,7 +2,10 @@ package chat.model;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user_role")
@@ -16,6 +19,10 @@ public class Role implements GrantedAuthority {
 
     @Column(name = "roles_description")
     private String description;
+
+
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+    private List<MyUser> users = new ArrayList<>();
 
 
 
@@ -48,5 +55,13 @@ public class Role implements GrantedAuthority {
     @Override
     public String getAuthority() {
         return getRolesName();
+    }
+
+    public List<MyUser> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<MyUser> users) {
+        this.users = users;
     }
 }

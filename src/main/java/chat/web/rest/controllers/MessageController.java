@@ -4,6 +4,7 @@ package chat.web.rest.controllers;
 import chat.model.Message;
 import chat.model.MyUser;
 import chat.repositories.MessageRepository;
+import chat.repositories.UserRepository;
 import chat.web.rest.dto.ConvertToDTO;
 import chat.web.rest.dto.MessageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,15 @@ public class MessageController {
     @Autowired
     private final MessageRepository messageRepository;
 
-    public MessageController(MessageRepository messageRepository, ConvertToDTO convertToDTO) {
+    @Autowired
+    private UserRepository userRepository;
+
+    public MessageController(MessageRepository messageRepository,
+                             ConvertToDTO convertToDTO,
+                             UserRepository userRepository) {
         this.messageRepository = messageRepository;
         this.convertToDTO = convertToDTO;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("v1/messages")
@@ -39,17 +46,17 @@ public class MessageController {
 
     @PostMapping("v1/messages")
     public MessageDTO createMessage(@RequestBody MessageDTO message,
-                                @AuthenticationPrincipal MyUser user) {
-        message.setAuthorName(user.getUsername());
+                                    @AuthenticationPrincipal MyUser user) {
+        if (user != null) {
+            message.setAuthorName(user.getUsername());
+        } else message.setAuthorName("Guest");
         Message messageDb = convertToDTO.convertMessage(message);
         messageDb.setAuthor(user);
         messageRepository.save(messageDb);
         return message;
 
+
     }
-
-
-
 
 
 }

@@ -2,9 +2,12 @@ package chat.web.rest.controllers;
 
 import chat.model.MyUser;
 import chat.repositories.MessageRepository;
+import chat.repositories.RoomRepository;
 import chat.repositories.UserRepository;
+import chat.services.RoomService;
 import chat.services.UserService;
 import chat.web.rest.dto.ConvertToDTO;
+import chat.web.rest.dto.RoomDTO;
 import chat.web.rest.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Controller
 @RequestMapping("/")
@@ -32,12 +36,22 @@ public class RegistrationController {
     private ConvertToDTO convertToDTO;
 
     @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private RoomService roomService;
+
+    @Autowired
     public RegistrationController(MessageRepository messageRepository,
                                   UserRepository userRepository,
-                                  ConvertToDTO convertToDTO) {
+                                  RoomRepository roomRepository,
+                                  ConvertToDTO convertToDTO,
+                                  RoomService roomService) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
+        this.roomRepository = roomRepository;
         this.convertToDTO = convertToDTO;
+        this.roomService = roomService;
     }
 
     @GetMapping
@@ -46,6 +60,8 @@ public class RegistrationController {
         if (user != null) {
             UserDTO profile = convertToDTO.convertUserToDTO(user);
             data.put("profile", profile);
+            List<RoomDTO> rooms = roomService.usersRoom(profile);
+            data.put("usersRooms",rooms );
         } else {
             data.put("profile", user);
         }
@@ -54,6 +70,11 @@ public class RegistrationController {
                 convertToDTO.convertToDTOListOfMessages(messageRepository.findAll()));
         data.put("users",
                 convertToDTO.convertToDTOListOfUsers(userRepository.findAll()));
+        data.put("rooms",
+                convertToDTO.convertToDTOListOfRooms(roomRepository.findAll()));
+
+        data.put("currentRoomId",0);
+
         model.addAttribute("frontendData", data);
         return "index";
     }

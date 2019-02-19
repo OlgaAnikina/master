@@ -1,4 +1,4 @@
-body{
+body {
     text-align: center;
     background: azure;
     font-family: Helvetica, sans-serif;
@@ -7,14 +7,13 @@ body{
 }
 
 .button {
-    display: inline-block;
-    position: relative;
-    width: 80px;
-    height: 25px;
-    text-align: center;
-    font:13pt "Bold Italic Art", "Bold Italic Art", sans-serif;
-    margin: 20px;
-    background: #befdfd;
+    align: right;
+    width: 30%;
+}
+
+.btn-block {
+    width: 80%;
+    border-radius: 5px;
 }
 
 tr td:first-child {
@@ -26,12 +25,13 @@ td {
     border: 1px solid;
     text-align: left;
 }
+
 tr:nth-child(2n + 1) {
     text-align: left;
 }
 
 tr:nth-child(2n) {
-    background:  #befdfd;
+    background: #befdfd;
     text-align: right;
 }
 
@@ -46,13 +46,9 @@ text {
 }
 
 .block1 {
-    margin: 20px;
+
     width: 200px;
-    background: #fafbff;
-    padding: 10px;
-    padding-right: 20px;
-    border: solid 1px #00547d;
-    float: initial;
+
 
 }
 
@@ -60,17 +56,63 @@ text {
     padding-left: 12px;
     border-left-width: 10px;
     margin-left: 200px;
-    width:300px;
-    height:300px;
+    width: 300px;
+    height: 300px;
     overflow-x: scroll;
     overflow-y: scroll;
     margin-top: 40px;
 
 
 }
+
 .author {
-    width: 300px;
+
     font-style: italic;
+    float: right;
+    text-align: right;
 }
 
 
+.list {
+    text-align: left;
+    max-width: 450px;
+    margin: auto;
+}
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.container {
+    max-width: 960px;
+}
+
+.pricing-header {
+    max-width: 700px;
+}
+
+.card-deck .card {
+    min-width: 220px;
+}
+
+.card-deck .card:first-child{
+    flex-grow: 3;
+}
+
+.card-deck .card:last-child{
+    flex-grow: 5;
+}
+
+.selfMessage {
+    align: right;
+}
+
+.otherMessage {
+    align: left;
+}

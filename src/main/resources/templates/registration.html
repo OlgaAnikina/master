@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+
+    <link rel="stylesheet" href="/css/login.css">
     <title>Registration new user</title>
 </head>
 <body>
-<form th:action="@{/registration}" method="post">
+<form th:action="@{/registration}" method="post" class="form-signin">
+    <h1 class="h3 mb-3 font-weight-normal">Please registration</h1>
     <div><label> User Name : <input type="text" name="username"/> </label></div>
-    <div><label> Password: <input type="password" name="password"/> </label></div>
-    <div><input type="submit" value="Registration"/></div>
+    <div><label> Password: <input type="password" name="password" class="cs-only"/> </label></div>
+    <div><input class="btn btn-lg btn-primary btn-block" type="submit" value="Registration"/></div>
 </form>
 </body>
 </html>
