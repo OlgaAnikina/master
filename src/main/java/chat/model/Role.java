@@ -6,9 +6,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name = "user_role")
+@Table(name = "roles")
 public class Role implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,8 +22,12 @@ public class Role implements GrantedAuthority {
     private String description;
 
 
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Relation> roleRelations;
+
+/*
     @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
-    private List<MyUser> users = new ArrayList<>();
+    private List<MyUser> users = new ArrayList<>();*/
 
 
 
@@ -57,11 +62,5 @@ public class Role implements GrantedAuthority {
         return getRolesName();
     }
 
-    public List<MyUser> getUsers() {
-        return users;
-    }
 
-    public void setUsers(List<MyUser> users) {
-        this.users = users;
-    }
 }

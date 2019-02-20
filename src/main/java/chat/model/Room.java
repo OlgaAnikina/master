@@ -13,15 +13,21 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(nullable = false)
     private String roomsName;
+    
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<Message> messages;
+    private List<Message> messages;
 
-    @ManyToMany(mappedBy = "participants", fetch = FetchType.EAGER)
-    private List<MyUser> participants = new ArrayList<>();
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Relation> roomRelations;
 
-    public Room() {    }
+
+    public Room() {
+        roomRelations = new ArrayList<>();
+        messages = new ArrayList<>();
+    }
 
 
     public Long getId() {
@@ -32,11 +38,11 @@ public class Room {
         this.id = id;
     }
 
-    public Set<Message> getMessages() {
+    public List<Message> getMessages() {
         return messages;
     }
 
-    public void setMessages(Set<Message> messages) {
+    public void setMessages(List<Message> messages) {
         this.messages = messages;
     }
 
@@ -48,7 +54,7 @@ public class Room {
         this.roomsName = roomsName;
     }
 
-    public List<MyUser> getParticipants() {
+  /*  public List<MyUser> getParticipants() {
         return participants;
     }
 
@@ -59,8 +65,21 @@ public class Room {
     public void addParticipants(MyUser participant) {
         participants.add(participant);
     }
-
+*/
     public void addMessage(Message message) {
         this.messages.add(message);
     }
+
+    public List<Relation> getRoomRelations() {
+        return roomRelations;
+    }
+
+    public void setRoomRelations(List<Relation> roomRelations) {
+        this.roomRelations = roomRelations;
+    }
+
+    public void addRelation(Relation relation) {
+        this.roomRelations.add(relation);
+    }
 }
+

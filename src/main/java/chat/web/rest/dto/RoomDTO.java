@@ -9,6 +9,7 @@ public class RoomDTO {
     private String name;
     private List<String> participantsName;
     private List<MessageDTO> messages;
+    private String ownerName;
 
     public RoomDTO() {
 
@@ -44,7 +45,7 @@ public class RoomDTO {
         this.participantsName.add(user.getName());
     }
 
-       public List<MessageDTO> getMessages() {
+    public List<MessageDTO> getMessages() {
         return messages;
     }
 
@@ -56,5 +57,15 @@ public class RoomDTO {
         this.messages.add(message);
     }
 
+    public void setMessages(List<MessageDTO> messages) {
+        this.messages = messages;
+    }
 
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
 }

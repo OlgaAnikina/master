@@ -2,8 +2,10 @@ package chat.web.rest.controllers;
 
 
 import chat.model.MyUser;
+import chat.model.Relation;
 import chat.model.Role;
 import chat.model.Room;
+import chat.repositories.RelationRepository;
 import chat.repositories.RoleRepository;
 import chat.repositories.RoomRepository;
 import chat.repositories.UserRepository;
@@ -15,10 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,6 +25,7 @@ import java.util.stream.Collectors;
 public class RoomsController {
 
     List<Role> role;
+    List<Relation> rel;
 
     @Autowired
     private RoomRepository roomRepository;
@@ -39,16 +39,21 @@ public class RoomsController {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private RelationRepository relationRepository;
+
 
     public RoomsController(ConvertToDTO convertToDTO,
                            RoomRepository roomRepository,
                            UserRepository userRepository,
-                           RoleRepository roleRepository) {
+                           RoleRepository roleRepository,
+                           RelationRepository relationRepository) {
         this.roomRepository = roomRepository;
         this.convertToDTO = convertToDTO;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        role = roleRepository.findAll();
+        this.relationRepository = relationRepository;
+
     }
 
     @GetMapping
@@ -70,45 +75,54 @@ public class RoomsController {
 
 
     @PostMapping
-    @Transactional
     public RoomDTO createRoom(Model model, @RequestBody RoomDTO roomDTO,
                              @AuthenticationPrincipal MyUser owner) {
 
-
+        role = roleRepository.findAll();
         Room duplicatedRoom = getDuplicatedRoom(roomDTO);
         if(duplicatedRoom != null){
             return convertToDTO.convertToRoomDTO(duplicatedRoom);
         }
         Room room = convertToDTO.convertToRoom(roomDTO);
-        owner.addRole(role.get(0));
-        room.addParticipants(owner);
-        owner.addParticipants(room);
-        userRepository.save(owner);
+        roomRepository.save(room);
 
-        for (String participantsName : roomDTO.getParticipantsName()) {
+        Relation relation = new Relation();
+        relation.setRoom(room);
+        relation.setUser(owner);
+        relation.setRole(role.get(0));
+        relationRepository.save(relation);
+        room.addRelation(relation);
+
+        for (String participantsName:roomDTO.getParticipantsName()){
+            Relation relationParticipant = new Relation();
+            relationParticipant.setRole(role.get(2));
             MyUser user = userRepository.findByUsername(participantsName);
-            if (user != null) {
-                user.addRole(role.get(2));
-
-                user.addParticipants(room);
-                userRepository.save(user);
-            }
-
+            relationParticipant.setUser(user);
+            relationParticipant.setRoom(room);
+            relationRepository.save(relationParticipant);
+            room.addRelation(relationParticipant);
         }
 
-        roomRepository.save(room);
         return convertToDTO.convertToRoomDTO(room);
 
     }
 
+    private String buildRoomName(RoomDTO room){
+        StringBuilder builder = new StringBuilder();
+        List<String> relations = new ArrayList<>();
+        Collections.copy(room.getParticipantsName(), relations);
+        relations.add(room.getOwnerName());
+        builder.append(relations);
+        return builder.toString();
+    }
+
     private Room getDuplicatedRoom(RoomDTO roomDTO) {
-        for(Room room:roomRepository.findAll()){
-            List<String> partisipanse  = room.getParticipants()
-                    .stream()
-                    .map(MyUser::getUsername)
-                    .collect(Collectors.toList());
-            if(partisipanse.containsAll(roomDTO.getParticipantsName()))
-                return room;
+        List<Room> rooms = roomRepository.findAll();
+        if(rooms != null){
+            for(Room room: rooms){
+                if(room.getRoomsName().equals(roomDTO.getName()))
+                    return room;
+            }
         }
         return null;
 }

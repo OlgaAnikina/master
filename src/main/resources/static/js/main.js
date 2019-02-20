@@ -31,8 +31,8 @@ Vue.component('message-form', {
 });
 
 Vue.component('modal', {
-    template: '<script type="text/x-template" id="modal-template">\n' +
-        '  <transition name="modal">\n' +
+    props: ['showModal'],
+    template: '<div> <transition name="modal">\n' +
         '    <div class="modal-mask">\n' +
         '      <div class="modal-wrapper">\n' +
         '        <div class="modal-container">\n' +
@@ -52,7 +52,7 @@ Vue.component('modal', {
         '          <div class="modal-footer">\n' +
         '            <slot name="footer">\n' +
         '              default footer\n' +
-        '              <button class="modal-default-button" @click="$emit(\'close\')">\n' +
+        '              <button class="modal-default-button"  @click="$emit(\'close\')"' +
         '                OK\n' +
         '              </button>\n' +
         '            </slot>\n' +
@@ -60,39 +60,43 @@ Vue.component('modal', {
         '        </div>\n' +
         '      </div>\n' +
         '    </div>\n' +
-        '  </transition>\n' +
-        '</script>'
-})
+        '  </transition></div>',
+    methods: {
+        closeModel: function () {
+            showModal = false
+        }
+    }
+});
 
 Vue.component('user', {
-    props: ['user'],
+    props: ['user', 'profile'],
     template: '<div>' +
         '<li class="list-group-item list-group-item-action"\n' +
-        '                            v-on:click="selectUser(user.name)">' +
+        '                            v-on:click="selectUser(user.name,profile.name)">' +
         ' {{user.name}}' +
         '</li>' +
         '</div>',
     methods: {
-        selectUser: function (name) {
+        selectUser: function (name, profile) {
 
             var room = {
-                name: 'private',
+                name: profile + '/' + name,
                 participantsName: [name]
             }
             roomApi.save({}, room).then(result =>
                 result.json().then(data => {
                     console.log(data);
-                    if(!frontendData.rooms.includes(data)) {
+                    if (!frontendData.rooms.includes(data)) {
                         frontendData.rooms.push(data);
                     }
 
                     frontendData.currentRoomId = data.id;
 
                     //todo: extract to function
-                    while(frontendData.messages.length > 0) {
+                    while (frontendData.messages.length > 0) {
                         frontendData.messages.pop();
                     }
-                    data.messages.forEach(function(item) {
+                    data.messages.forEach(function (item) {
                         frontendData.messages.push(item);
                     });
                 })
@@ -104,10 +108,10 @@ Vue.component('user', {
 });
 
 Vue.component('usersList', {
-    props: ['users'],
-    template:' <div class="card-body">' +
+    props: ['users', 'profile'],
+    template: ' <div class="card-body">' +
         '  <ul class="list-group">' +
-        ' <user v-for="user in users" :key="user.id" :user="user"/>' +
+        ' <user v-bind:profile="profile" v-for="user in users" :key="user.id" :user="user"/>' +
         '</ul> </div>'
 });
 
@@ -119,14 +123,13 @@ Vue.component('message-row', {
         '<div class="list-group">' +
         '  <div>{{message.text}}</div>' +
         '  <div class="author"><i>{{message.authorName}}</i>' +
-        '</div></div>'+
+        '</div></div>' +
         ' </li></div>' +
-
         '</div>'
 });
 
 Vue.component('inputForm', {
-    props:['messages'],
+    props: ['messages'],
     data: function () {
         return {
             text: '',
@@ -150,7 +153,7 @@ Vue.component('inputForm', {
     methods: {
 
         save: function (text) {
-            var message = {text: text, roomId:frontendData.currentRoomId};
+            var message = {text: text, roomId: frontendData.currentRoomId};
             messageApi.save({}, message).then(result =>
                 result.json().then(data => {
                     this.messages.push(data);
@@ -181,23 +184,23 @@ Vue.component('rightPanel', {
 Vue.component('roomsList', {
     props: ['usersRooms'],
     template: ' <div><li v-for="userRooms in usersRooms" class="list-group-item list-group-item-action"\n' +
-        '                            v-on:click="selectUser()">' +
+        '                            v-on:click="selectRoom()">' +
         '                            {{userRooms.name}}' +
         '                        </li></div>',
     methods: {
-        selectUser: function (name) {
+        selectRoom: function (name) {
 
             var room = {
-                name: 'private',
+                name: name,
                 participantsName: [name]
             }
             roomApi.save({}, room).then(result =>
                 result.json().then(data => {
                     //todo: extract to function
-                    while(frontendData.messages.length > 0) {
+                    while (frontendData.messages.length > 0) {
                         frontendData.messages.pop();
                     }
-                    data.messages.forEach(function(item) {
+                    data.messages.forEach(function (item) {
                         frontendData.messages.push(item);
                     });
                 })
@@ -247,7 +250,7 @@ Vue.component('users-list', {
     }
 });
 Vue.component('messagesChat', {
-    props:['messages', 'profile'],
+    props: ['messages', 'profile'],
     template: ' <div class="card-body">\n' +
         ' <ul class="list-group">\n' +
         '<message-row v-for="message in messages" :key="message.id" :message="message"/>' +
@@ -255,37 +258,41 @@ Vue.component('messagesChat', {
 });
 
 Vue.component('leftHeadPanel', {
-    props:['profile'],
-    template: '<div class="card-header">' +
-'                <div class="row">' +
-'                    <div class="col-sm">\n' +
-'                        <div v-if="!profile">Guest</div>\n' +
-'                        <div v-else>{{profile.name}}</div>\n' +
-'                    </div>' +
-'                    <div class="col-sm">\n' +
-'                        <div v-if="profile">\n' +
-'                            <div class="col-sm">\n' +
-'                                <a class=" btn-primary btn-block mb-2" href="/logout">Log out</a>\n' +
+    props: ['profile', 'showModal'],
+    template: '<div><div class="card-header">' +
+        '                <div class="row">' +
+        '                    <div class="col-sm">\n' +
+        '                        <div v-if="!profile">Guest</div>\n' +
+        '                        <div v-else>{{profile.name}}</div>\n' +
+        '                    </div>' +
+        '                    <div class="col-sm">\n' +
+        '                        <div v-if="profile">\n' +
+        '                            <div class="col-sm">\n' +
+        '                                <a class=" btn-primary btn-block mb-2" href="/logout">Log out</a>\n' +
 
-'                            </div>\n' +
-'                            <div class="col-sm">\n' +
-'                                <button type="button" @click="showModal = true" class="btn-primary btn-block mb-2" data-toggle="modal"\n' +
-'                                           >\n' +
-'                                    Create room\n' +
-'                                </button>\n' +
+        '                            </div>\n' +
+        '                            <div class="col-sm">\n' +
+        '                                <button type="button" @click="showModal = true" class="btn-primary btn-block mb-2">' +
+                'Create room</button>' +
 
-'                            </div>\n' +
-'                        </div>\n' +
-'                        <div v-else>\n' +
-'                            <div class="col-sm">\n' +
-'                                <a class=" btn-primary btn-block mb-2" href="/login">Login</a>\n' +
+        '                            </div>\n' +
+        '                        </div>\n' +
+        '                        <div v-else>\n' +
+        '                            <div class="col-sm">\n' +
+        '                                <a class=" btn-primary btn-block mb-2" href="/login">Login</a>\n' +
 
-'                            </div>\n' +
-'                        </div>\n' +
-'                    </div>\n' +
+        '                            </div>\n' +
+        '                        </div>\n' +
+        '                    </div>\n' +
 
-'                </div>\n' +
-'            </div>'
+        '                </div></div>' +
+
+    '<modal v-bind:showModal="showModal" v-if="showModal" @close="showModal = false">' +
+    ' <h3 slot="header">custom header</h3>'+
+    '</modal>'+
+      '  </div>'
+
+
 
 });
 Vue.component('leftPanelBody', {
@@ -294,7 +301,7 @@ Vue.component('leftPanelBody', {
         '                <div class="list-group">\n' +
         '                    <div class="card-header">Users</div>\n' +
         '                    <ul class="list-group">' +
-        '                        <usersList :users="users"></usersList>\n' +
+        '                        <usersList v-bind:profile="profile" :users="users"></usersList>\n' +
         '                    </ul>' +
         '                    <div class="card-header">Chats</div>\n' +
         '                    <ul class="list-group">\n' +
@@ -302,49 +309,41 @@ Vue.component('leftPanelBody', {
         '                    </ul>' +
         '                </div>' +
         '            </div></div>'
-})
+
+});
 
 Vue.component('leftPanel', {
-    props: ['profile', 'usersRooms', 'users'],
-    template:  '<div>' +
-        '<leftHeadPanel v-bind:profile="profile"></leftHeadPanel>' +
+    props: ['profile', 'usersRooms', 'users', 'showModal'],
+    template: '<div>' +
+        '<leftHeadPanel v-bind:profile="profile" v-bind:showModal="showModal"></leftHeadPanel>' +
         '<leftPanelBody v-bind:profile="profile" v-bind:users="users" v-bind:usersRooms="usersRooms"></leftPanelBody>' +
         '</div>'
 
-    });
+});
 
 var app = new Vue({
     el: '#app',
     template: '<div>' +
         //tittle
         '<modal v-if="showModal" @close="showModal = false">' +
-        '<h3 slot="header">custom header</h3>\n' +
-        '  </modal>' +
+        '<h3 slot="header">custom header</h3>' +
+        '</modal>' +
         '<div class="row mb-3">' +
-        '        <div class="col">' +
-        '            <h1>Chat application </h1>' +
-        '            <hr>' +
-        '        </div></div>' +
-        '    <div class="card-deck mb-3 text-center">' +
-        '        <div class="card mb-4 shadow-sm">' +
-        '<leftPanel v-bind:users="users" v-bind:profile="profile" v-bind:usersRooms="usersRooms"></leftPanel>' +
-        '        </div>' +
-        '        <div class="card mb-2 shadow-sm">' +
-        '  <rightPanel v-bind:messages="messages" v-bind:profile="profile"></rightPanel>' +
-        '    </div></div>' +
-        '    <hr>' +
+        '<div class="col">' +
+        '<h1>Chat application </h1>' +
+        '<hr>' +
+        '</div></div>' +
+        '<div class="card-deck mb-3 text-center">' +
+        '<div class="card mb-4 shadow-sm">' +
+        '<leftPanel v-bind:users="users" v-bind:profile="profile"' +
+        ' v-bind:usersRooms="usersRooms" v-bind:showModal="showModal"></leftPanel>' +
+        '</div>' +
+        '<div class="card mb-2 shadow-sm">' +
+        '<rightPanel v-bind:messages="messages" v-bind:profile="profile"></rightPanel>' +
+        '</div></div>' +
+        '<hr>' +
         '</div>',
-    /* template: '<div class="col-md-4">' +
 
-         '<div v-if="!profile"><h4>You can authorize</h4> <a href="/login">here</a> </div>' +
-         '<div v-if="!profile"><h4>or add new profile</h4> <a href="/registration">here</a> </div>' +
-         '<div v-else> <div>{{profile.name}}&nbsp;<a href="/logout">Log out</a>' +
-         '<div><users-list :users="users" /> </div>' +
-
-         '</div></div>' +
-         '<messages-list :messages="messages"/>' +
-
-         '</div>',*/
     data: function () {
         return {
             users: frontendData.users,

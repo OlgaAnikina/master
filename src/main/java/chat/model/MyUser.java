@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "myuser")
-public class MyUser implements UserDetails {
+public class MyUser implements UserDetails, Comparable<MyUser> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -24,21 +24,16 @@ public class MyUser implements UserDetails {
     private Set<Message> messages;
 
 
-    @ManyToMany(fetch = FetchType.EAGER , cascade = CascadeType.ALL)
+   /* @ManyToMany(fetch = FetchType.EAGER , cascade = CascadeType.ALL)
     @JsonIgnore
     @JoinTable(name = "rooms_participants",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id"))
     private List<Room> participants;
+*/
 
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "relation")
-    private Set<Relation> relations
-
-
-
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Relation> relations;
 
     public MyUser() {
     }
@@ -119,7 +114,7 @@ public class MyUser implements UserDetails {
     public boolean isEnabled() {
         return isActive();
     }
-
+/*
     public void addParticipants(Room room) {
         participants.add(room);
     }
@@ -131,16 +126,17 @@ public class MyUser implements UserDetails {
     public void setParticipants(List<Room> participants) {
         this.participants = participants;
     }
-
-    public List<Role> getRoles() {
-        return roles;
+*/
+    public Set<Relation> getRelations() {
+        return relations;
     }
 
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
+    public void setRelations(Set<Relation> relations) {
+        this.relations = relations;
     }
 
-    public void addRole(Role role) {
-        roles.add(role);
+    @Override
+    public int compareTo(MyUser user) {
+        return username.compareTo(user.getUsername());
     }
 }
