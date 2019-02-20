@@ -34,7 +34,7 @@ public class RoomService {
         for (RoomDTO room : roomsDTO) {
 
             List<String> participants = room.getParticipantsName();
-            if ((containUser(room.getParticipantsName(), user.getName()))) {
+            if ((containUser(room.getParticipantsName(), user.getName()) && !room.getType().equals("PRIVATE"))) {
                 resultRooms.add(room);
 
             }

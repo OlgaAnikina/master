@@ -81,7 +81,8 @@ Vue.component('user', {
 
             var room = {
                 name: profile + '/' + name,
-                participantsName: [name]
+                participantsName: [name],
+                type: "PRIVATE"
             }
             roomApi.save({}, room).then(result =>
                 result.json().then(data => {

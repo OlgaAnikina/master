@@ -76,11 +76,10 @@ public class RoomsController {
 
     @PostMapping
     public RoomDTO createRoom(Model model, @RequestBody RoomDTO roomDTO,
-                             @AuthenticationPrincipal MyUser owner) {
-
+                              @AuthenticationPrincipal MyUser owner) {
         role = roleRepository.findAll();
-        Room duplicatedRoom = getDuplicatedRoom(roomDTO);
-        if(duplicatedRoom != null){
+        Room duplicatedRoom = getDuplicatedRoom(roomDTO, owner);
+        if (duplicatedRoom != null) {
             return convertToDTO.convertToRoomDTO(duplicatedRoom);
         }
         Room room = convertToDTO.convertToRoom(roomDTO);
@@ -93,7 +92,7 @@ public class RoomsController {
         relationRepository.save(relation);
         room.addRelation(relation);
 
-        for (String participantsName:roomDTO.getParticipantsName()){
+        for (String participantsName : roomDTO.getParticipantsName()) {
             Relation relationParticipant = new Relation();
             relationParticipant.setRole(role.get(2));
             MyUser user = userRepository.findByUsername(participantsName);
@@ -107,25 +106,19 @@ public class RoomsController {
 
     }
 
-    private String buildRoomName(RoomDTO room){
-        StringBuilder builder = new StringBuilder();
-        List<String> relations = new ArrayList<>();
-        Collections.copy(room.getParticipantsName(), relations);
-        relations.add(room.getOwnerName());
-        builder.append(relations);
-        return builder.toString();
-    }
-
-    private Room getDuplicatedRoom(RoomDTO roomDTO) {
+    private Room getDuplicatedRoom(RoomDTO roomDTO, MyUser owner) {
         List<Room> rooms = roomRepository.findAll();
-        if(rooms != null){
-            for(Room room: rooms){
-                if(room.getRoomsName().equals(roomDTO.getName()))
-                    return room;
+        if (rooms != null) {
+            for (Room room : rooms) {
+                if (roomDTO.getType().equals("PRIVATE")) {
+                    String ownerName = owner.getUsername();
+                    String participant = roomDTO.getParticipantsName().stream().findAny().orElse(null);
+                    if (room.getRoomsName().contains(ownerName)
+                            && room.getRoomsName().contains(participant))
+                        return room;
+                }
             }
         }
         return null;
-}
-
-
+    }
 }

@@ -10,6 +10,7 @@ public class RoomDTO {
     private List<String> participantsName;
     private List<MessageDTO> messages;
     private String ownerName;
+    private String type;
 
     public RoomDTO() {
 
@@ -67,5 +68,13 @@ public class RoomDTO {
 
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

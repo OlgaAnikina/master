@@ -78,6 +78,7 @@ public class ConvertToDTO {
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setId(room.getId());
         roomDTO.setName(room.getRoomsName());
+        roomDTO.setType(room.getType());
 
         for (Relation relation : room.getRoomRelations()) {
             if (relation.getRole().getRolesName().equals("PARTICIPANT")) {
@@ -100,6 +101,7 @@ public class ConvertToDTO {
     public Room convertToRoom(RoomDTO roomDTO) {
         Room room = new Room();
         room.setRoomsName(roomDTO.getName());
+        room.setType(roomDTO.getType());
         for (MessageDTO messageDto : roomDTO.getMessages())
             room.addMessage(convertMessage(messageDto));
         return room;

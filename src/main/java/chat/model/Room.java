@@ -4,7 +4,6 @@ package chat.model;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "rooms")
@@ -15,7 +14,6 @@ public class Room {
 
     @Column(nullable = false)
     private String roomsName;
-    
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Message> messages;
@@ -23,6 +21,8 @@ public class Room {
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Relation> roomRelations;
 
+    @Column
+    private String type;
 
     public Room() {
         roomRelations = new ArrayList<>();
@@ -54,18 +54,18 @@ public class Room {
         this.roomsName = roomsName;
     }
 
-  /*  public List<MyUser> getParticipants() {
-        return participants;
-    }
+    /*  public List<MyUser> getParticipants() {
+          return participants;
+      }
 
-    public void setParticipants(List<MyUser> participants) {
-        this.participants = participants;
-    }
+      public void setParticipants(List<MyUser> participants) {
+          this.participants = participants;
+      }
 
-    public void addParticipants(MyUser participant) {
-        participants.add(participant);
-    }
-*/
+      public void addParticipants(MyUser participant) {
+          participants.add(participant);
+      }
+  */
     public void addMessage(Message message) {
         this.messages.add(message);
     }
@@ -80,6 +80,14 @@ public class Room {
 
     public void addRelation(Relation relation) {
         this.roomRelations.add(relation);
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
 
