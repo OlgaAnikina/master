@@ -62,14 +62,15 @@ public class RegistrationController {
             data.put("profile", profile);
             List<RoomDTO> rooms = roomService.usersRoom(profile);
             data.put("usersRooms",rooms );
+            data.put("users",
+                    convertToDTO.convertToDTOListOfUsers(userService.getFilterUsers(user)));
         } else {
             data.put("profile", user);
         }
 
         data.put("messages",
-                convertToDTO.convertToDTOListOfMessages(messageRepository.findAll()));
-        data.put("users",
-                convertToDTO.convertToDTOListOfUsers(userRepository.findAll()));
+                convertToDTO.convertToDTOListOfMessages(roomService.getCommonMessage()));
+
         data.put("rooms",
                 convertToDTO.convertToDTOListOfRooms(roomRepository.findAll()));
 

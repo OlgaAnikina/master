@@ -1,6 +1,8 @@
 package chat.services;
 
+import chat.model.Message;
 import chat.model.Room;
+import chat.repositories.MessageRepository;
 import chat.repositories.RoomRepository;
 import chat.web.rest.dto.ConvertToDTO;
 import chat.web.rest.dto.RoomDTO;
@@ -21,9 +23,14 @@ public class RoomService {
     @Autowired
     private ConvertToDTO convertToDTO;
 
-    public RoomService(RoomRepository roomRepository, ConvertToDTO convertToDTO) {
+    @Autowired
+    private MessageRepository messageRepository;
+
+    public RoomService(RoomRepository roomRepository, ConvertToDTO convertToDTO,
+                       MessageRepository messageRepository) {
         this.roomRepository = roomRepository;
         this.convertToDTO = convertToDTO;
+        this.messageRepository = messageRepository;
     }
 
     public List<RoomDTO> usersRoom(UserDTO user) {
@@ -49,6 +56,18 @@ public class RoomService {
             }
         }
         return false;
+    }
+
+    public List<Message> getCommonMessage() {
+        List<Message> commonMessages = new ArrayList<>();
+        List<Message> allMessage = messageRepository.findAll();
+        for (Message message : allMessage) {
+            if (message.getRoomId() == 0) {
+                commonMessages.add(message);
+            }
+        }
+        return commonMessages;
+
     }
 
 }

@@ -65,6 +65,10 @@ public class Message {
         this.room = room;
     }
 
+    public long getRoomId() {
+        return this.room.getId();
+    }
+
     @Override
     public String toString() {
         return "Message{ id = " + " text: "
