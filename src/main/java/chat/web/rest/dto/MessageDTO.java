@@ -10,12 +10,11 @@ public class MessageDTO {
     public MessageDTO() {
     }
 
-  //  public MessageDTO(long id, String text, UserDTO author) {
     public MessageDTO(long id, String text, String author) {
         this.id = id;
         this.text = text;
         this.authorName = author;
-     //   this.author = author;
+
     }
 
     public long getId() {
@@ -33,14 +32,6 @@ public class MessageDTO {
     public void setText(String text) {
         this.text = text;
     }
-
-  /*  public UserDTO getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(UserDTO author) {
-        this.author = author;
-    }*/
 
     public String getAuthorName() {
         return authorName;

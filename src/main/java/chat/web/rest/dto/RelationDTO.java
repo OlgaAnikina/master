@@ -7,7 +7,8 @@ public class RelationDTO {
     private String userName;
     private String role;
 
-    public RelationDTO() {}
+    public RelationDTO() {
+    }
 
     public long getId() {
         return id;

@@ -13,12 +13,13 @@ import chat.web.rest.dto.ConvertToDTO;
 import chat.web.rest.dto.RoomDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("v2/room")
@@ -55,24 +56,6 @@ public class RoomsController {
         this.relationRepository = relationRepository;
 
     }
-
-    @GetMapping
-    public String getRoomsIncludedUsers(Model model, @AuthenticationPrincipal MyUser owner) {
-        HashMap<Object, Object> data = new HashMap<>();
-        List<RoomDTO> resultRooms = new ArrayList<>();
-        List<Room> roomList = roomRepository.findAll();
-        System.out.println(roomList);
-        Collection<RoomDTO> roomsDTO = convertToDTO.convertToDTOListOfRooms(roomList);
-        for (RoomDTO room : roomsDTO) {
-            if ((room.getParticipantsName().contains(owner.getUsername()))) {
-                resultRooms.add(room);
-            }
-        }
-        data.put("usersRooms", resultRooms);
-        model.addAttribute("frontendData", data);
-        return "index";
-    }
-
 
     @PostMapping
     public RoomDTO createRoom(Model model, @RequestBody RoomDTO roomDTO,

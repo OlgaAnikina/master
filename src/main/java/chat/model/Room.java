@@ -1,6 +1,5 @@
 package chat.model;
 
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.List;
 @Table(name = "rooms")
 public class Room {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
 
     @Column(nullable = false)
@@ -28,7 +27,6 @@ public class Room {
         roomRelations = new ArrayList<>();
         messages = new ArrayList<>();
     }
-
 
     public Long getId() {
         return id;
@@ -54,18 +52,6 @@ public class Room {
         this.roomsName = roomsName;
     }
 
-    /*  public List<MyUser> getParticipants() {
-          return participants;
-      }
-
-      public void setParticipants(List<MyUser> participants) {
-          this.participants = participants;
-      }
-
-      public void addParticipants(MyUser participant) {
-          participants.add(participant);
-      }
-  */
     public void addMessage(Message message) {
         this.messages.add(message);
     }

@@ -1,19 +1,17 @@
 package chat.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "myuser")
 public class MyUser implements UserDetails, Comparable<MyUser> {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
     private String username;
     private String password;
@@ -23,21 +21,10 @@ public class MyUser implements UserDetails, Comparable<MyUser> {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Message> messages;
 
-
-   /* @ManyToMany(fetch = FetchType.EAGER , cascade = CascadeType.ALL)
-    @JsonIgnore
-    @JoinTable(name = "rooms_participants",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "room_id"))
-    private List<Room> participants;
-*/
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Relation> relations;
 
-    public MyUser() {
-    }
-
+    public MyUser() {    }
 
     public MyUser(String username, String password, boolean active, Set<Message> messages) {
         this.username = username;
@@ -72,7 +59,6 @@ public class MyUser implements UserDetails, Comparable<MyUser> {
         this.username = username;
     }
 
-
     public boolean isActive() {
         return active;
     }
@@ -88,7 +74,6 @@ public class MyUser implements UserDetails, Comparable<MyUser> {
     public void setPassword(String password) {
         this.password = password;
     }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -114,19 +99,7 @@ public class MyUser implements UserDetails, Comparable<MyUser> {
     public boolean isEnabled() {
         return isActive();
     }
-/*
-    public void addParticipants(Room room) {
-        participants.add(room);
-    }
 
-    public List<Room> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(List<Room> participants) {
-        this.participants = participants;
-    }
-*/
     public Set<Relation> getRelations() {
         return relations;
     }

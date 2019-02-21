@@ -16,6 +16,11 @@ body {
     border-radius: 5px;
 }
 
+.btn-block-modal {
+    width: 15%;
+    border-radius: 5px;
+}
+
 tr td:first-child {
     padding-right: 20px;
     text-align: left;

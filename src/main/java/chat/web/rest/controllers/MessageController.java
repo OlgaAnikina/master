@@ -1,6 +1,5 @@
 package chat.web.rest.controllers;
 
-
 import chat.model.Message;
 import chat.model.MyUser;
 import chat.repositories.MessageRepository;

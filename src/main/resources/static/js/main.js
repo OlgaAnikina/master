@@ -1,73 +1,6 @@
 var messageApi = Vue.resource('/v1/messages{/id}{?roomId}');
 var roomApi = Vue.resource('/v2/room{/roomId}');
 
-
-Vue.component('message-form', {
-    props: ['messages'],
-    data: function () {
-        return {
-            text: '',
-
-        }
-    },
-
-    template: '<div class="form-group" >' +
-        '<input type="text" placeholder="Text of message" v-model="text"/>' +
-        '<input type="button" :class="{button:true}" value="Save" @click="save" />' +
-        '' +
-        '</div>',
-    methods: {
-        save: function () {
-            var message = {text: this.text};
-
-            messageApi.save({}, message).then(result =>
-                result.json().then(data => {
-                    this.messages.push(data);
-
-                })
-            )
-        }
-    }
-});
-
-Vue.component('modal', {
-    props: ['showModal'],
-    template: '<div> <transition name="modal">\n' +
-        '    <div class="modal-mask">\n' +
-        '      <div class="modal-wrapper">\n' +
-        '        <div class="modal-container">\n' +
-        '\n' +
-        '          <div class="modal-header">\n' +
-        '            <slot name="header">\n' +
-        '              default header\n' +
-        '            </slot>\n' +
-        '          </div>\n' +
-        '\n' +
-        '          <div class="modal-body">\n' +
-        '            <slot name="body">\n' +
-        '              default body\n' +
-        '            </slot>\n' +
-        '          </div>\n' +
-        '\n' +
-        '          <div class="modal-footer">\n' +
-        '            <slot name="footer">\n' +
-        '              default footer\n' +
-        '              <button class="modal-default-button"  @click="$emit(\'close\')"' +
-        '                OK\n' +
-        '              </button>\n' +
-        '            </slot>\n' +
-        '          </div>\n' +
-        '        </div>\n' +
-        '      </div>\n' +
-        '    </div>\n' +
-        '  </transition></div>',
-    methods: {
-        closeModel: function () {
-            showModal = false
-        }
-    }
-});
-
 Vue.component('user', {
     props: ['user', 'profile'],
     template: '<div>' +
@@ -110,10 +43,10 @@ Vue.component('user', {
 
 Vue.component('usersList', {
     props: ['users', 'profile'],
-    template: ' <div class="card-body">' +
-        '  <ul class="list-group">' +
-        ' <user v-bind:profile="profile" v-for="user in users" :key="user.id" :user="user"/>' +
-        '</ul> </div>'
+    template: '<div class="card-body">' +
+        '<ul class="list-group">' +
+        '<user v-bind:profile="profile" v-for="user in users" :key="user.id" :user="user"/>' +
+        '</ul></div>'
 });
 
 Vue.component('message-row', {
@@ -136,21 +69,17 @@ Vue.component('inputForm', {
             text: '',
         }
     },
-    template: '<div class="card-header">\n' +
-        '                <div class="form-group">\n' +
-        '                    <form class="was-validated">\n' +
-        '                        <div class="mb-3">\n' +
-        '                            <label for="validationTextarea">Input message:</label>\n' +
-        '                            <textarea v-model="text" class="form-control is-invalid"\n' +
-        '                                      id="validationTextarea" placeholder="Required example textarea"\n' +
-        '                                      required></textarea>\n' +
+    template: '<div class="card-header">' +
+        '<div class="form-group">' +
+        '<form class="was-validated">' +
+        '<div class="mb-3">' +
+        '<label for="validationTextarea">Input message:</label>' +
+        '<textarea v-model="text" class="form-control is-invalid"' +
+        'id="validationTextarea" placeholder="Required example textarea" required></textarea>' +
 
-        '                        </div>\n' +
-        '                    </form>\n' +
-
-        '                    <input type="button" class="btn btn-lg btn-primary mb-2 button" value="Save" @click="save(text)"/>\n' +
-        '                </div>\n' +
-        '            </div>',
+        '</div></form>' +
+        '<input type="button" class="btn-lg btn-primary mb-2 button" value="Save" @click="save(text)"/>' +
+        '</div></div>',
     methods: {
 
         save: function (text) {
@@ -164,15 +93,73 @@ Vue.component('inputForm', {
     }
 });
 
-Vue.component('messages-list', {
-    props: ['messages'],
-    template: '<div class="tableChat ">' +
-        '<message-form :messages="messages" />' +
-        '<message-row v-for="message in messages" :key="message.id" :message="message"/>' +
+Vue.component('modal', {
+    props: ['isModalVisible', 'users'],
+    data: function () {
+        return {
+            checkedUsers: [],
+            roomName: ''
+        }
+    },
+    template: '<div>' +
+        '<transition name="modal-fade">' +
+        '<div class="modal-container" role="dialog">' +
+        '<div  ref="modal">' +
+        '<header class="modal-header">' +
+        '<slot name="header">' +
+        '<h2>Create new chat</h2>' +
+        '<button type="button" class="btn-primary btn-block-modal mb-2"' +
+        ' @click="close" aria-label="Close modal">x</button>' +
+        '</slot>' +
+        '</header>' +
+
+        '<section class="modal-body">' +
+        '<slot name="body">' +
+        '<br>' +
+        '<form class="was-validated">' +
+        '<div class="mb-3">' +
+        '<label for="validationTextarea">Input chat\'s name:</label>' +
+        '<text v-model="text" ' +
+        'id="validationTextarea" ></text>' +
+
+        '</div>' +
+        '<br>' +
+        '<div>' +
+             '<div type="checkbox" v-for="user in users"' +
+                ' class="list-group-item list-group-item-action" >' +
+              //  '<label>{{user.name}}</label>' +
+                '<input type = checkbox  id="{{user.name}}"   v-model="checkedUsers" >' +
+                '<label>{{user.name}}</label>' +
+        '</div>' +
+        '</div>' +
+        '  <br>\n' +
+        '  <span>Отмеченные имена: {{ checkedUsers }}</span>\n' +
+       '</form>' +
+        '</slot>' +
+        '</section>' +
+
+
+        '<footer class="modal-footer">' +
+        '<slot name="footer">' +
+        '<button type="button" class="btn-primary btn-block mb-2" ' +
+        '@click="close" aria-label="Close modal">Create' +
+        '</button>' +
+        '</slot>' +
+        '</footer>' +
+        '</div>' +
+        '</div>' +
+        '</transition>' +
         '</div>',
-
-
+    methods: {
+        showModal() {
+            this.isModalVisible = true;
+        },
+        closeModal() {
+            this.isModalVisible = false;
+        }
+    }
 });
+
 Vue.component('rightPanel', {
     props: ['messages', 'profile'],
     template: '<div>' +
@@ -184,10 +171,10 @@ Vue.component('rightPanel', {
 
 Vue.component('roomsList', {
     props: ['usersRooms'],
-    template: ' <div><li v-for="userRooms in usersRooms" class="list-group-item list-group-item-action"\n' +
-        '                            v-on:click="selectRoom()">' +
-        '                            {{userRooms.name}}' +
-        '                        </li></div>',
+    template: '<div><li v-for="userRooms in usersRooms"' +
+        ' class="list-group-item list-group-item-action" v-on:click="selectRoom()">' +
+        '{{userRooms.name}}' +
+        '</li></div>',
     methods: {
         selectRoom: function (name) {
 
@@ -211,45 +198,6 @@ Vue.component('roomsList', {
     }
 });
 
-
-Vue.component('user-row', {
-    props: ['user', 'rooms'],
-    data: function () {
-        return {
-            name: 'private',
-            participantsName: ['name']
-        }
-    },
-    template:
-        '<div class="list row">' +
-        ' <div class="col-md-6">' +
-        ' <ul> <li class="list-group-item list-group-item-action">{{user.name}}  </li> </ul> </div> </div>',
-
-
-});
-
-Vue.component('users-list', {
-    props: ['users'],
-    template:
-        '<div>' +
-
-        '<user-row v-for="user in users"  v-on="open" :key="user.id" :user="user"/>' +
-        '</div>',
-    methods: {
-        open: function (event) {
-            var room = {
-                name: this.name,
-                participantsName: this.participantsName
-            }
-            roomApi.save({}, room).then(result =>
-                result.json().then(data => {
-                    this.rooms.push(data);
-                })
-            )
-
-        }
-    }
-});
 Vue.component('messagesChat', {
     props: ['messages', 'profile'],
     template: ' <div class="card-body">\n' +
@@ -259,43 +207,54 @@ Vue.component('messagesChat', {
 });
 
 Vue.component('leftHeadPanel', {
-    props: ['profile', 'showModal'],
+    props: ['profile', 'isModalVisible', 'users'],
     template: '<div><div class="card-header">' +
-        '                <div class="row">' +
-        '                    <div class="col-sm">\n' +
-        '                        <div v-if="!profile">Guest</div>\n' +
-        '                        <div v-else>{{profile.name}}</div>\n' +
-        '                    </div>' +
-        '                    <div class="col-sm">\n' +
-        '                        <div v-if="profile">\n' +
-        '                            <div class="col-sm">\n' +
-        '                                <a class=" btn-primary btn-block mb-2" href="/logout">Log out</a>\n' +
+        '<div class="row">' +
+        '<div class="col-sm">' +
+        '<div v-if="!profile">Guest</div>' +
+        '<div v-else>{{profile.name}}</div>' +
+        '</div>' +
+        '<div class="col-sm">' +
+        '<div v-if="profile">' +
+        '<div class="col-sm">' +
+        '<a class="btn-primary btn-block mb-2" href="/logout">Log out</a>' +
 
-        '                            </div>\n' +
-        '                            <div class="col-sm">\n' +
-        '                                <button type="button" @click="showModal = true" class="btn-primary btn-block mb-2">' +
-                'Create room</button>' +
+        '</div>' +
+        '<div class="col-sm">' +
+        '<button type="button" @click="showModal" class="btn-primary btn-block mb-2">' +
+        'Create room</button>' +
 
-        '                            </div>\n' +
-        '                        </div>\n' +
-        '                        <div v-else>\n' +
-        '                            <div class="col-sm">\n' +
-        '                                <a class=" btn-primary btn-block mb-2" href="/login">Login</a>\n' +
+        '</div>' +
+        '</div>' +
+        '<div v-else>' +
+        '<div class="col-sm">' +
+        '<a class="btn-primary btn-block mb-2" href="/login">Login</a>' +
 
-        '                            </div>\n' +
-        '                        </div>\n' +
-        '                    </div>\n' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
 
-        '                </div></div>' +
+        '</div></div>' +
 
-    '<modal v-bind:showModal="showModal" v-if="showModal" @close="showModal = false">' +
-    ' <h3 slot="header">custom header</h3>'+
-    '</modal>'+
-      '  </div>'
-
+        /* '<modal v-bind:showModal="showModal" v-if="showModal" @close="showModal = false">' +
+         ' <h3 slot="header">custom header</h3>'+
+         '</modal>'+*/
+        '<modal  v-show="isModalVisible" v-bind:users="users" ' +
+        'v-bind:isModalVisible="isModalVisible" @close="closeModal" />' +
+        '</div>' +
+        '  </div>',
+    methods: {
+        showModal() {
+            this.isModalVisible = true;
+        },
+        closeModal() {
+            this.isModalVisible = false;
+        }
+    }
 
 
 });
+
 Vue.component('leftPanelBody', {
     props: ['profile', 'usersRooms', 'users'],
     template: '<div><div v-if="profile" class="card-body">\n' +
@@ -314,9 +273,10 @@ Vue.component('leftPanelBody', {
 });
 
 Vue.component('leftPanel', {
-    props: ['profile', 'usersRooms', 'users', 'showModal'],
+    props: ['profile', 'usersRooms', 'users', 'isModalVisible'],
     template: '<div>' +
-        '<leftHeadPanel v-bind:profile="profile" v-bind:showModal="showModal"></leftHeadPanel>' +
+        '<leftHeadPanel v-bind:profile="profile" v-bind:isModalVisible="isModalVisible"' +
+        ' v-bind:users="users" ></leftHeadPanel>' +
         '<leftPanelBody v-bind:profile="profile" v-bind:users="users" v-bind:usersRooms="usersRooms"></leftPanelBody>' +
         '</div>'
 
@@ -325,10 +285,7 @@ Vue.component('leftPanel', {
 var app = new Vue({
     el: '#app',
     template: '<div>' +
-        //tittle
-        '<modal v-if="showModal" @close="showModal = false">' +
-        '<h3 slot="header">custom header</h3>' +
-        '</modal>' +
+
         '<div class="row mb-3">' +
         '<div class="col">' +
         '<h1>Chat application </h1>' +
@@ -337,7 +294,7 @@ var app = new Vue({
         '<div class="card-deck mb-3 text-center">' +
         '<div class="card mb-4 shadow-sm">' +
         '<leftPanel v-bind:users="users" v-bind:profile="profile"' +
-        ' v-bind:usersRooms="usersRooms" v-bind:showModal="showModal"></leftPanel>' +
+        ' v-bind:usersRooms="usersRooms" v-bind:isModalVisible="isModalVisible"></leftPanel>' +
         '</div>' +
         '<div class="card mb-2 shadow-sm">' +
         '<rightPanel v-bind:messages="messages" v-bind:profile="profile"></rightPanel>' +
@@ -353,8 +310,8 @@ var app = new Vue({
             rooms: frontendData.rooms,
             usersRooms: frontendData.usersRooms,
             messagesInRoom: frontendData.messagesInRoom,
-            showModal: false,
-            currentRoomId: frontendData.currentRoomId
+            currentRoomId: frontendData.currentRoomId,
+            isModalVisible: false,
         }
     }
 });

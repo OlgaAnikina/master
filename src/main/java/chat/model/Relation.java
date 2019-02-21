@@ -4,12 +4,11 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "rooms_participants")
-public class Relation implements Comparable<Relation>{
+public class Relation implements Comparable<Relation> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     private long id;
-
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)

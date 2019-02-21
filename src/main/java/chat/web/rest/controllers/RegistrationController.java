@@ -61,7 +61,7 @@ public class RegistrationController {
             UserDTO profile = convertToDTO.convertUserToDTO(user);
             data.put("profile", profile);
             List<RoomDTO> rooms = roomService.usersRoom(profile);
-            data.put("usersRooms",rooms );
+            data.put("usersRooms", rooms);
             data.put("users",
                     convertToDTO.convertToDTOListOfUsers(userService.getFilterUsers(user)));
         } else {
@@ -74,7 +74,7 @@ public class RegistrationController {
         data.put("rooms",
                 convertToDTO.convertToDTOListOfRooms(roomRepository.findAll()));
 
-        data.put("currentRoomId",0);
+        data.put("currentRoomId", 0);
 
         model.addAttribute("frontendData", data);
         return "index";
