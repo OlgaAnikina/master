@@ -1,15 +1,15 @@
 package chat.web.rest.controllers;
 
 import chat.model.MyUser;
-import chat.repositories.MessageRepository;
-import chat.repositories.RoomRepository;
-import chat.repositories.UserRepository;
+import chat.model.Relation;
+import chat.repositories.*;
 import chat.services.RoomService;
 import chat.services.UserService;
 import chat.web.rest.dto.ConvertToDTO;
 import chat.web.rest.dto.RoomDTO;
 import chat.web.rest.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,17 +42,28 @@ public class RegistrationController {
     private RoomService roomService;
 
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private RelationRepository relationRepository;
+
+    @Autowired
     public RegistrationController(MessageRepository messageRepository,
                                   UserRepository userRepository,
                                   RoomRepository roomRepository,
                                   ConvertToDTO convertToDTO,
-                                  RoomService roomService) {
+                                  RoomService roomService,
+                                  RoleRepository roleRepository,
+                                  RelationRepository relationRepository) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.convertToDTO = convertToDTO;
         this.roomService = roomService;
+        this.roleRepository = roleRepository;
+        this.relationRepository = relationRepository;
     }
+
 
     @GetMapping
     public String main(Model model, @AuthenticationPrincipal MyUser user) {
@@ -60,7 +71,8 @@ public class RegistrationController {
         if (user != null) {
             UserDTO profile = convertToDTO.convertUserToDTO(user);
             data.put("profile", profile);
-            List<RoomDTO> rooms = roomService.usersRoom(profile);
+           // List<RoomDTO> rooms = roomService.usersRoom(profile);
+            List<RoomDTO> rooms = roomService.getRooms(user);
             data.put("usersRooms", rooms);
             data.put("users",
                     convertToDTO.convertToDTOListOfUsers(userService.getFilterUsers(user)));
@@ -89,9 +101,15 @@ public class RegistrationController {
     public String addUser(MyUser user) {
 
         if (!userService.addUser(user)) {
+
             return "registration";
         }
 
+        Relation relation = new Relation();
+        relation.setRoom(roomRepository.findById(0));
+        relation.setUser(user);
+        relation.setRole(roleRepository.findByRolesName("PARTICIPANT"));
+        relationRepository.save(relation);
         return "redirect:/login";
     }
 

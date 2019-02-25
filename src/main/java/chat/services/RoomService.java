@@ -1,8 +1,11 @@
 package chat.services;
 
 import chat.model.Message;
+import chat.model.MyUser;
+import chat.model.Relation;
 import chat.model.Room;
 import chat.repositories.MessageRepository;
+import chat.repositories.RelationRepository;
 import chat.repositories.RoomRepository;
 import chat.web.rest.dto.ConvertToDTO;
 import chat.web.rest.dto.RoomDTO;
@@ -26,11 +29,16 @@ public class RoomService {
     @Autowired
     private MessageRepository messageRepository;
 
+    @Autowired
+    private RelationRepository relationRepository;
+
     public RoomService(RoomRepository roomRepository, ConvertToDTO convertToDTO,
-                       MessageRepository messageRepository) {
+                       MessageRepository messageRepository,
+                       RelationRepository relationRepository) {
         this.roomRepository = roomRepository;
         this.convertToDTO = convertToDTO;
         this.messageRepository = messageRepository;
+        this.relationRepository = relationRepository;
     }
 
     public List<RoomDTO> usersRoom(UserDTO user) {
@@ -38,6 +46,7 @@ public class RoomService {
         List<RoomDTO> resultRooms = new ArrayList<>();
         List<Room> roomDB = roomRepository.findAll();
         Collection<RoomDTO> roomsDTO = convertToDTO.convertToDTOListOfRooms(roomDB);
+
         for (RoomDTO room : roomsDTO) {
 
             List<String> participants = room.getParticipantsName();
@@ -68,6 +77,20 @@ public class RoomService {
         }
         return commonMessages;
 
+    }
+
+    public List<RoomDTO> getRooms(MyUser owner) {
+        List<Relation> relations = relationRepository.findAll();
+        List<RoomDTO> result = new ArrayList<>();
+
+        for(Relation relation: relations) {
+            if((relation.getUser().getUsername().equals(owner.getUsername()))
+                    && (relation.getRoom().getType().equals("PUBLIC"))) {
+                result.add(convertToDTO.convertToRoomDTO(relation.getRoom()));
+            }
+
+        }
+        return result;
     }
 
 }
