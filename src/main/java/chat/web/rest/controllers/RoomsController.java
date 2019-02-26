@@ -14,11 +14,11 @@ import chat.web.rest.dto.RoomDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -26,7 +26,6 @@ import java.util.List;
 public class RoomsController {
 
     List<Role> role;
-    List<Relation> rel;
 
     @Autowired
     private RoomRepository roomRepository;
@@ -101,7 +100,7 @@ public class RoomsController {
                             && room.getRoomsName().contains(participant))
                         return room;
                 }*/
-                if (roomDTO.getName().equals(room.getRoomsName()) ) {
+                if (roomDTO.getName().equals(room.getRoomsName())) {
                     return room;
                 }
             }

@@ -8,11 +8,13 @@ import chat.repositories.MessageRepository;
 import chat.repositories.RelationRepository;
 import chat.repositories.RoomRepository;
 import chat.web.rest.dto.ConvertToDTO;
+import chat.web.rest.dto.MessageDTO;
 import chat.web.rest.dto.RoomDTO;
 import chat.web.rest.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,7 +54,6 @@ public class RoomService {
             List<String> participants = room.getParticipantsName();
             if ((containUser(room.getParticipantsName(), user.getName()) && !room.getType().equals("PRIVATE"))) {
                 resultRooms.add(room);
-
             }
         }
         return resultRooms;
@@ -88,9 +89,26 @@ public class RoomService {
                     && (relation.getRoom().getType().equals("PUBLIC"))) {
                 result.add(convertToDTO.convertToRoomDTO(relation.getRoom()));
             }
-
         }
         return result;
     }
 
+
+    public Collection<MessageDTO>  getLastMessages(LocalDateTime dateTime, long roomId, MyUser currentUser) {
+        synchronized (this) {
+            List<Message> result = new ArrayList<>();
+            Room room = roomRepository.findById(roomId);
+            for (Message messageInRoom : room.getMessages()) {
+                if (messageInRoom.getCreatedWhen().isAfter(dateTime)
+                        && currentUser != null
+                        && !currentUser.getUsername().equals(messageInRoom.getAuthorName())
+                        && !result.contains(messageInRoom)
+                ) {
+                    result.add(messageInRoom);
+                }
+            }
+            return convertToDTO.convertToDTOListOfMessages(result);
+        }
+
+    }
 }

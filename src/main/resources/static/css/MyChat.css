@@ -16,6 +16,11 @@ body {
     border-radius: 5px;
 }
 
+.btn-style {
+    border-radius: 5px;
+}
+
+
 .btn-block-modal {
     width: 15%;
     border-radius: 5px;
@@ -115,9 +120,9 @@ html {
 }
 
 .selfMessage {
-    align: right;
+    text-align: right;
 }
 
 .otherMessage {
-    align: left;
+    text-align: left;
 }

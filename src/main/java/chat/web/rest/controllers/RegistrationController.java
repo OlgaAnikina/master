@@ -9,7 +9,6 @@ import chat.web.rest.dto.ConvertToDTO;
 import chat.web.rest.dto.RoomDTO;
 import chat.web.rest.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -71,7 +70,7 @@ public class RegistrationController {
         if (user != null) {
             UserDTO profile = convertToDTO.convertUserToDTO(user);
             data.put("profile", profile);
-           // List<RoomDTO> rooms = roomService.usersRoom(profile);
+
             List<RoomDTO> rooms = roomService.getRooms(user);
             data.put("usersRooms", rooms);
             data.put("users",
@@ -87,6 +86,7 @@ public class RegistrationController {
                 convertToDTO.convertToDTOListOfRooms(roomRepository.findAll()));
 
         data.put("currentRoomId", 0);
+        data.put("currentRoom", convertToDTO.convertToRoomDTO(roomRepository.findById(0)));
 
         model.addAttribute("frontendData", data);
         return "index";

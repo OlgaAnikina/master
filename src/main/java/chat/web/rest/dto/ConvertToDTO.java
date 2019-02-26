@@ -8,6 +8,10 @@ import chat.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,14 +49,16 @@ public class ConvertToDTO {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setId(message.getId());
         messageDTO.setText(message.getText());
+        messageDTO.setRoomId(message.getRoom().getId());
         messageDTO.setAuthorName(message.getAuthorName());
-
+        messageDTO.setCreatedWhen(message.getCreatedWhen().toInstant(ZoneOffset.UTC).getEpochSecond());
         return messageDTO;
     }
 
     public Message convertMessage(MessageDTO messageDTO) {
         Message message = new Message();
         message.setText(messageDTO.getText());
+        message.setCreatedWhen(LocalDateTime.ofInstant(Instant.ofEpochMilli(messageDTO.getCreatedWhen()), ZoneId.systemDefault()));
         MyUser author = userRepository.findByUsername(messageDTO.getAuthorName());
         message.setAuthor(author);
 

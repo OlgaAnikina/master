@@ -1,6 +1,8 @@
 package chat.model;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table
@@ -19,6 +21,9 @@ public class Message {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "room_id")
     private Room room;
+
+    @Column(name="createdWhen")
+    private LocalDateTime createdWhen;
 
     public MyUser getAuthor() {
         return author;
@@ -65,6 +70,14 @@ public class Message {
 
     public long getRoomId() {
         return this.room.getId();
+    }
+
+    public LocalDateTime getCreatedWhen() {
+        return createdWhen;
+    }
+
+    public void setCreatedWhen(LocalDateTime createdWhen) {
+        this.createdWhen = createdWhen;
     }
 
     @Override
