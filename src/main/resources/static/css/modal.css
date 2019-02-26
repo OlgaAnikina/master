@@ -47,7 +47,7 @@
 
 .modal-footer {
     border-top: 1px solid #eeeeee;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 .modal-body {
@@ -94,3 +94,25 @@
 .checkbox span:hover:after{border-color:#999}
 .checkbox input{display:none}
 .checkbox input:checked + span:after{-webkit-animation:check .8s;-moz-animation:check .8s;-o-animation:check .8s;animation:check .8s;border-color:#555}
+
+.modal-container{
+    position: fixed;
+    z-index: 2;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-block{
+    width: 400px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.modal-content{
+    background: white;
+}

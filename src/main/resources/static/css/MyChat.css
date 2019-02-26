@@ -109,6 +109,7 @@ html {
 
 .card-deck .card {
     min-width: 220px;
+    max-height: 700px;
 }
 
 .card-deck .card:first-child{
@@ -120,9 +121,29 @@ html {
 }
 
 .selfMessage {
-    text-align: right;
+    justify-content: flex-end;
+    display: flex;
 }
 
 .otherMessage {
     text-align: left;
+}
+
+.block-messages{
+    max-height: 350px;
+    overflow-y: scroll;
+}
+
+.no-scroll{
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.list-messages{
+    max-height: 350px;
+}
+
+.list-chats, .list-users{
+    max-height: 225px;
+    overflow-y: scroll;
 }
