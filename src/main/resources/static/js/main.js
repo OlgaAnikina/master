@@ -1,6 +1,5 @@
 var messageApi = Vue.resource('/v1/messages{/id}{?roomId}');
 var roomApi = Vue.resource('/v2/room{/roomId}');
-var spammerApi = Vue.resource('v2/rooms/{roomsId}/messages/{lastMessageId}');
 
 Vue.component('user', {
     props: ['user', 'profile'],
@@ -54,11 +53,12 @@ Vue.component('usersList', {
 Vue.component('message-row', {
     props: ['message', 'profile'],
     template: '<div> ' +
-        '<div v-if="profile == null && message.authorName==\'Guest\' || profile && profile.name == message.authorName" class="selfMessage EEE">' +
+        '<div v-if="profile == null && message.authorName==\'Guest\' || profile && profile.name == message.authorName" class="selfMessage">' +
         '<li class="list-group-item list-group-item-action mb-2 block1">' +
         '<div class="list-;group  ">' +
         '  <div>{{message.text}}</div>' +
         '  <div class="author"><i>{{message.authorName}}</i></div>' +
+        '  <div class="QQQQ"><i>{{time()}}</i></div>' +
         '</div></li></div>' +
 
         '<div v-else>' +
@@ -66,11 +66,19 @@ Vue.component('message-row', {
         '<div class="list-group ">' +
         '  <div>{{message.text}}</div>' +
         '  <div class="author"><i>{{message.authorName}}</i></div>' +
+        '  <div class="QQQQ"><i>{{time()}}</i></div>' +
         '</div></li></div>' +
 
 
         // '</div>' +
-        '</div>'
+        '</div>',
+    methods: {
+        time() {
+            var now = new Date();
+
+            return now;
+        }
+    }
 });
 
 Vue.component('inputForm', {
@@ -193,7 +201,9 @@ Vue.component('modal', {
                     }
 
                     frontendData.currentRoomId = data.id;
-                    frontendData.currentRoom = data;
+                    frontendData.currentRoom.id = data.id;
+                    frontendData.currentRoom.name = data.name;
+                    frontendData.currentRoom.participantsName = data.participantsName;
 
                     while (frontendData.messages.length > 0) {
                         frontendData.messages.pop();
@@ -214,13 +224,7 @@ Vue.component('addParticipants', {
     data: function () {
         return {
             checkedUsers: [],
-            otherUsers: function (users, currentRoom) {
-                var otherUsersInRooms = [];
-                if (!currentRoom.participantsName.includes(users)) {
-                    otherUsersInRooms.push(user)
-                }
             }
-        }
     },
     computed: {
         isComplete() {
@@ -247,36 +251,25 @@ Vue.component('addParticipants', {
         '<div class="mb-3">' +
         '<label> Users in this chat:</label>' +
         '<div v-for="name in currentRoom.participantsName">' +
-
         '<div>{{name}}</div></div>' +
-        // '<div><li v-for="user in users">' +
-        // ' class="list-group-item list-group-item-action" v-on:click="selectRoom(userRooms)">' +
-        //  '{{user.name}}' +
-        //  '</li></div>' +
         '</div>' +
-        '<br>' +
         '<div class="card-header">Choose participants to chat:</div>' +
-
-        '<ul class="list-group list-group-flush">' +
-        '<li v-for="user in users" class="list-group-item"  >' +
-        '<div v-if="!currentRoom.participantsName.includes(user.name)">{{user.name}}</div>' +
-        //'{{user.name}}' +
-        /* '<label class="checkbox" >' +
+        '<ul class="list-group list-group-flush rrr">' +
+        '<li v-for="user in users" class="list-group-item" v-if="!currentRoom.participantsName.includes(user.name) && user.name!=\'\'"  >' +
+        '<div v-if="!currentRoom.participantsName.includes(user.name) ">{{user.name}}' +
+        '<label class="checkbox" >' +
          '<input type="checkbox"  v-bind:value="user.name" v-model="checkedUsers" />' +
          '<span class="primary"></span>' +
-         '</label>\n' +*/
+         '</label></div>' +
         '</li></ul>' +
-        '<br>' +
         '<span>Отмеченные имена: {{ checkedUsers }}</span>' +
         '</form>' +
         '</slot>' +
         '</section>' +
-
-
         '<footer class="modal-footer">' +
         '<slot name="footer">' +
         '<button type="button" :disabled=\'!isComplete\'  class="btn-primary btn-block mb-2" ' +
-        '@click="createRoom(roomName, checkedUsers )" aria-label="Close modal">Add participants' +
+        '@click="addUsers(checkedUsers, currentRoom)" aria-label="Close modal">Add participants' +
         '</button>' +
         '</slot>' +
         '</footer>' +
@@ -290,34 +283,29 @@ Vue.component('addParticipants', {
         initClose() {
             this.$emit('close')
         },
-        createRoom: function (roomName, checkedUsers) {
+        addUsers: function (checkedUsers, currentRoom) {
+            console.log(checkedUsers);
+            frontendData.currentRoom.participantsName.push(checkedUsers);
 
             var room = {
-                name: roomName,
-                participantsName: checkedUsers,
-                type: "PUBLIC"
+                name: currentRoom.name,
+                participantsName:  currentRoom.participantsName,
+                type: currentRoom.type
             }
-            roomApi.save({}, room).then(result =>
-                result.json().then(data => {
-                    console.log(data);
-                    if (!frontendData.usersRooms.includes(data)) {
-                        frontendData.usersRooms.push(data);
-                    }
 
-                    frontendData.currentRoomId = data.id;
-                    frontendData.currentRoom = data;
+            roomApi.update({roomId: frontendData.currentRoomId}, checkedUsers)
+                .then(response => {
+                    response.json().then(data => {
 
-                    while (frontendData.messages.length > 0) {
-                        frontendData.messages.pop();
-                    }
-                    data.messages.forEach(function (item) {
-                        frontendData.messages.push(item);
-                    });
+                    }, response => {
+
+                    })
                 })
-            );
+
             this.$emit('close')
 
         }
+
     }
 });
 
@@ -327,14 +315,14 @@ Vue.component('infOfRoom', {
             isModalAdd: false
         }
     },
-    props: ['currentRoom', 'users'],
+    props: ['currentRoom', 'users', 'profile'],
     template: '<div>' +
         '<div class="card-header">' +
         '<div class="row">' +
         '<div class="col-sm">' +
         '<div class="otherMessage">Chat\'s name: ' +
         '{{currentRoom.name}} </div></div>' +
-        '<div class="col-sm selfMessage">' +
+        '<div v-if="profile != null" class="col-sm selfMessage">' +
         '<button type="button" @click="isModalAdd = true" class="btn-primary btn-style mb-2">' +
         'Chat\'s property</button>' +
         '</div></div>' +
@@ -356,7 +344,7 @@ Vue.component('rightPanel', {
     props: ['messages', 'profile', 'currentRoom', 'users'],
     template: '<div>' +
         '<inputForm v-bind:messages="messages"></inputForm>' +
-        '<infOfRoom v-bind:users="users" :currentRoom="currentRoom" ></infOfRoom>' +
+        '<infOfRoom v-bind:users="users" :currentRoom="currentRoom" v-bind:profile="profile"></infOfRoom>' +
         '<div class="card-header mb-2">Messages:</div>' +
         '<messagesChat v-bind:profile="profile" :messages="messages"></messagesChat>' +
         '</div>'
@@ -538,29 +526,29 @@ var app = new Vue({
         }
     },
     methods: {
-        pollData() {
-            var time = new Date().getTime();
-            // this.messages
-            var updateMessages = setInterval(() => {
-                this.$http.get('/v2/rooms/' + frontendData.currentRoomId + '/messages' + '?currentTime=' + time).then(response => {
+         pollData() {
+             var time = new Date().getTime();
 
-                    response.body.forEach(function (item) {
-                        frontendData.messages.push(item);
-                    });
-                    console.log(response.body);
-                    console.log(frontendData.messages);
-                    time = new Date().getTime();
-                    //  time -= 1000;
-                }, response => {
-                    // error callback
-                });
+             var updateMessages = setInterval(() => {
+                 this.$http.get('/v2/rooms/' + frontendData.currentRoomId + '/messages' + '?currentTime=' + time).then(response => {
+
+                     response.body.forEach(function (item) {
+                         frontendData.messages.push(item);
+                     });
+                     console.log(response.body);
+                     console.log(frontendData.messages);
+                     time = new Date().getTime();
+
+                 }, response => {
+                     // error callback
+                 });
 
 
-            }, 1000)
-        }
-    },
-    created() {
-        this.pollData();
-    }
+             }, 1000)
+         }
+     },
+     created() {
+         this.pollData();
+     }
 });
 

@@ -147,3 +147,7 @@ html {
     max-height: 225px;
     overflow-y: scroll;
 }
+
+.label-login {
+    width: 95px;
+}

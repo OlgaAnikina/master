@@ -1,6 +1,5 @@
 package chat.web.rest.controllers;
 
-
 import chat.model.MyUser;
 import chat.model.Relation;
 import chat.model.Role;
@@ -13,12 +12,9 @@ import chat.web.rest.dto.ConvertToDTO;
 import chat.web.rest.dto.RoomDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -57,7 +53,7 @@ public class RoomsController {
     }
 
     @PostMapping
-    public RoomDTO createRoom(Model model, @RequestBody RoomDTO roomDTO,
+    public RoomDTO createRoom(@RequestBody RoomDTO roomDTO,
                               @AuthenticationPrincipal MyUser owner) {
         role = roleRepository.findAll();
         Room duplicatedRoom = getDuplicatedRoom(roomDTO, owner);
@@ -107,4 +103,22 @@ public class RoomsController {
         }
         return null;
     }
+
+    @PutMapping("/{roomsId}")
+    public void addParticipants(@RequestBody Collection<String> newParticipants,
+                                @PathVariable("roomsId") long roomsId) {
+        for (String user : newParticipants) {
+            Relation relation = new Relation();
+            relation.setRoom(roomRepository.findById(roomsId));
+            relation.setUser(userRepository.findByUsername(user));
+            relation.setRole(roleRepository.findByRolesName("PARTICIPANT"));
+            relationRepository.save(relation);
+            Room room = roomRepository.findById(roomsId);
+            room.addRelation(relation);
+            roomRepository.save(room);
+        }
+
+    }
+
+
 }

@@ -1,31 +1,32 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      >
+>
 <head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
     <link rel="stylesheet" href="/css/login.css">
     <title>Login</title>
 </head>
 <body>
-<div th:if="${param.error}">
-    Invalid username and password.
-</div>
-
 <form th:action="@{/login}" method="post" class="form-signin">
-   <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label > User Name : <input type="text" name="username"/> </label></div>
-    <div><label> Password: <input class="cs-only" type="password" name="password"/> </label></div>
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <label class="label-login">User Name:</label> <input type="text" name="username"/>
+    <div><label class="label-login">Password:</label> <input class="cs-only" type="password" name="password"/></div>
+
+    <div th:if="${param.error}" class="error-login">
+        Invalid username and password.
+    </div>
     <div class="row">
         <div class="col-sm">
-    <div><input class="btn btn-lg btn-primary btn-block" type="submit" value="Login"/></div>
+            <div><input class="btn btn-lg btn-primary btn-block" type="submit" value="Login"/></div>
         </div>
         <div class="col-sm">
-    <div>
-        <a class="btn btn-lg btn-primary btn-block" href="/registration">Sign in</a>
-       </div>
-    </div>
+            <div>
+                <a class="btn btn-lg btn-primary btn-block" href="/registration">Sign in</a>
+            </div>
+        </div>
     </div>
 
 </form>
