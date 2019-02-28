@@ -25,12 +25,16 @@ public class SpamerController {
         this.roomService = roomService;
     }
 
-    @GetMapping("v2/rooms/{roomsId}/messages")
-    public Collection<MessageDTO> getMessageById(@RequestParam(name="currentTime", required = false) long currentTime,
+    @GetMapping("v2/rooms/{roomsId}/messages/{lastId}")
+    public Collection<MessageDTO> getMessageById(
+            //@RequestParam(name = "lastId", required = false) Long lastId,
+            @PathVariable("lastId") long lastId,
                                                  @PathVariable("roomsId") long roomsId,
                                                  @AuthenticationPrincipal MyUser user) {
-        LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(currentTime), ZoneId.systemDefault());
-        return roomService.getLastMessages(now, roomsId, user);
+        //   LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(currentTime), ZoneId.systemDefault());
+
+        // return roomService.getLastMessages(now, roomsId, user);
+        return roomService.getMessagesAfterId(roomsId, user, lastId);
     }
 
 

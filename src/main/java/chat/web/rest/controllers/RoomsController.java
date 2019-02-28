@@ -89,13 +89,13 @@ public class RoomsController {
         List<Room> rooms = roomRepository.findAll();
         if (rooms != null) {
             for (Room room : rooms) {
-               /* if (roomDTO.getType().equals("PRIVATE")) {
+                if (roomDTO.getType().equals("PRIVATE")) {
                     String ownerName = owner.getUsername();
                     String participant = roomDTO.getParticipantsName().stream().findAny().orElse(null);
                     if (room.getRoomsName().contains(ownerName)
                             && room.getRoomsName().contains(participant))
                         return room;
-                }*/
+                }
                 if (roomDTO.getName().equals(room.getRoomsName())) {
                     return room;
                 }

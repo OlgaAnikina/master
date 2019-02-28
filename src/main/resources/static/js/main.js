@@ -25,13 +25,19 @@ Vue.component('user', {
                     }
 
                     frontendData.currentRoomId = data.id;
-                    frontendData.currentRoom = data;
+                    frontendData.currentRoom.id = data.id;
+                    frontendData.currentRoom.name = data.name;
+                    frontendData.currentRoom.participantsName = data.participantsName;
+                    frontendData.currentRoom.type = data.type;
+
 
                     while (frontendData.messages.length > 0) {
                         frontendData.messages.pop();
+
                     }
                     data.messages.forEach(function (item) {
                         frontendData.messages.push(item);
+
                     });
 
                 })
@@ -56,21 +62,17 @@ Vue.component('message-row', {
         '<div v-if="profile == null && message.authorName==\'Guest\' || profile && profile.name == message.authorName" class="selfMessage">' +
         '<li class="list-group-item list-group-item-action mb-2 block1">' +
         '<div class="list-;group  ">' +
-        '  <div>{{message.text}}</div>' +
-        '  <div class="author"><i>{{message.authorName}}</i></div>' +
-        '  <div class="QQQQ"><i>{{time()}}</i></div>' +
+        '<div>{{message.text}}</div>' +
+        '<div class="author"><i>{{message.authorName}}</i></div>' +
+
         '</div></li></div>' +
 
         '<div v-else>' +
         '<li class="list-group-item list-group-item-action mb-2 block1">' +
         '<div class="list-group ">' +
-        '  <div>{{message.text}}</div>' +
-        '  <div class="author"><i>{{message.authorName}}</i></div>' +
-        '  <div class="QQQQ"><i>{{time()}}</i></div>' +
+        '<div>{{message.text}}</div>' +
+        '<div class="author"><i>{{message.authorName}}</i></div>' +
         '</div></li></div>' +
-
-
-        // '</div>' +
         '</div>',
     methods: {
         time() {
@@ -110,7 +112,7 @@ Vue.component('inputForm', {
             var message = {text: text, roomId: frontendData.currentRoomId, createdWhen: new Date().getTime()};
             messageApi.save({}, message).then(result =>
                 result.json().then(data => {
-                    frontendData.messages.push(data);
+                  //  frontendData.messages.push(data);
                 })
             )
         }
@@ -149,7 +151,7 @@ Vue.component('modal', {
         '<form class="was-validated">' +
         '<div class="mb-3">' +
         '<label for="validationTextarea">Input chat\'s name:</label>' +
-        '<input type="text" placeholder="Text of message" v-model="roomName"/>' +
+        '<input type="text" placeholder="Name of new chat" v-model="roomName"/>' +
         '</div>' +
         '<br>' +
         '<div class="card-header">Choose participants to chat:</div>' +
@@ -163,7 +165,7 @@ Vue.component('modal', {
         '</label>\n' +
         '</li></ul>' +
         '<br>' +
-        '<span>Отмеченные имена: {{ checkedUsers }}</span>' +
+     //   '<span>Отмеченные имена: {{ checkedUsers }}</span>' +
         '</form>' +
         '</slot>' +
         '</section>' +
@@ -204,6 +206,7 @@ Vue.component('modal', {
                     frontendData.currentRoom.id = data.id;
                     frontendData.currentRoom.name = data.name;
                     frontendData.currentRoom.participantsName = data.participantsName;
+                    frontendData.currentRoom.type = data.type;
 
                     while (frontendData.messages.length > 0) {
                         frontendData.messages.pop();
@@ -249,20 +252,20 @@ Vue.component('addParticipants', {
         '<br>' +
         '<form class="was-validated">' +
         '<div class="mb-3">' +
-        '<label> Users in this chat:</label>' +
+        '<div class="card-header"> Users in this chat:</div>' +
         '<div v-for="name in currentRoom.participantsName">' +
-        '<div>{{name}}</div></div>' +
+        '<li>{{name}}</li></div>' +
         '</div>' +
         '<div class="card-header">Choose participants to chat:</div>' +
         '<ul class="list-group list-group-flush rrr">' +
-        '<li v-for="user in users" class="list-group-item" v-if="!currentRoom.participantsName.includes(user.name) && user.name!=\'\'"  >' +
+        '<li v-for="user in users" class="list-group-item" v-if="!currentRoom.participantsName.includes(user.name)"  >' +
         '<div v-if="!currentRoom.participantsName.includes(user.name) ">{{user.name}}' +
         '<label class="checkbox" >' +
          '<input type="checkbox"  v-bind:value="user.name" v-model="checkedUsers" />' +
          '<span class="primary"></span>' +
          '</label></div>' +
         '</li></ul>' +
-        '<span>Отмеченные имена: {{ checkedUsers }}</span>' +
+    //    '<span>Отмеченные имена: {{ checkedUsers }}</span>' +
         '</form>' +
         '</slot>' +
         '</section>' +
@@ -315,16 +318,23 @@ Vue.component('infOfRoom', {
             isModalAdd: false
         }
     },
+    computed: {
+        isPublic() {
+            return frontendData.currentRoom.type == 'PUBLIC' || frontendData.currentRoomId == 0;
+        }
+    },
     props: ['currentRoom', 'users', 'profile'],
     template: '<div>' +
+        '<div v-if="isPublic">' +
         '<div class="card-header">' +
         '<div class="row">' +
         '<div class="col-sm">' +
         '<div class="otherMessage">Chat\'s name: ' +
-        '{{currentRoom.name}} </div></div>' +
+        '{{currentRoom.name}} </div>' +
         '<div v-if="profile != null" class="col-sm selfMessage">' +
         '<button type="button" @click="isModalAdd = true" class="btn-primary btn-style mb-2">' +
         'Chat\'s property</button>' +
+        '</div></div>' +
         '</div></div>' +
         '<addParticipants  v-show="isModalAdd" v-bind:users="users"  :currentRoom="currentRoom"' +
         ' @close="closeModal" />' +
@@ -344,6 +354,7 @@ Vue.component('rightPanel', {
     props: ['messages', 'profile', 'currentRoom', 'users'],
     template: '<div>' +
         '<inputForm v-bind:messages="messages"></inputForm>' +
+        '<div v-if="currentRoom.type== \'PUBLIC\'"' +
         '<infOfRoom v-bind:users="users" :currentRoom="currentRoom" v-bind:profile="profile"></infOfRoom>' +
         '<div class="card-header mb-2">Messages:</div>' +
         '<messagesChat v-bind:profile="profile" :messages="messages"></messagesChat>' +
@@ -376,6 +387,7 @@ Vue.component('roomsList', {
                     frontendData.currentRoom.id = data.id;
                     frontendData.currentRoom.name = data.name;
                     frontendData.currentRoom.participantsName = data.participantsName;
+                    frontendData.currentRoom.type = data.type;
 
                     while (frontendData.messages.length > 0) {
                         frontendData.messages.pop();
@@ -525,22 +537,47 @@ var app = new Vue({
 
         }
     },
+    computed: {
+        isLastId() {
+            if(frontendData.messages.length != 0) {
+                var lastId = frontendData.messages[0].id ;
+                console.log(lastId);
+                for (var i = 0; i < frontendData.messages.length; i++ ) {
+
+                    if(lastId < frontendData.messages[i].id) {
+                        lastId = frontendData.messages[i].id;
+                    }
+                }}
+            return lastId;
+        }
+    },
     methods: {
+        isLastId() {
+            if(frontendData.messages.length != 0) {
+                var lastId = frontendData.messages[0].id ;
+                console.log(lastId);
+                for (var i = 0; i < frontendData.messages.length; i++ ) {
+
+                    if(lastId < frontendData.messages[i].id) {
+                        lastId = frontendData.messages[i].id;
+                    }
+                }} else lastId = 0;
+            return lastId;
+        },
          pollData() {
-             var time = new Date().getTime();
 
              var updateMessages = setInterval(() => {
-                 this.$http.get('/v2/rooms/' + frontendData.currentRoomId + '/messages' + '?currentTime=' + time).then(response => {
+                // this.$http.get('/v2/rooms/' + frontendData.currentRoomId + '/messages' + '?currentTime=' + time).then(response => {
+                 this.$http.get('/v2/rooms/' + frontendData.currentRoomId + '/messages/' + this.isLastId() /*'?lastId=' + lastId*/).then(response => {
 
                      response.body.forEach(function (item) {
                          frontendData.messages.push(item);
                      });
                      console.log(response.body);
-                     console.log(frontendData.messages);
-                     time = new Date().getTime();
 
                  }, response => {
-                     // error callback
+
+
                  });
 
 
@@ -551,4 +588,5 @@ var app = new Vue({
          this.pollData();
      }
 });
+
 

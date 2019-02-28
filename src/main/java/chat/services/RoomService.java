@@ -84,8 +84,8 @@ public class RoomService {
         List<Relation> relations = relationRepository.findAll();
         List<RoomDTO> result = new ArrayList<>();
 
-        for(Relation relation: relations) {
-            if((relation.getUser().getUsername().equals(owner.getUsername()))
+        for (Relation relation : relations) {
+            if ((relation.getUser().getUsername().equals(owner.getUsername()))
                     && (relation.getRoom().getType().equals("PUBLIC"))) {
                 result.add(convertToDTO.convertToRoomDTO(relation.getRoom()));
             }
@@ -94,14 +94,14 @@ public class RoomService {
     }
 
 
-    public Collection<MessageDTO>  getLastMessages(LocalDateTime dateTime, long roomId, MyUser currentUser) {
+    public Collection<MessageDTO> getLastMessages(LocalDateTime dateTime, long roomId, MyUser currentUser) {
         synchronized (this) {
             List<Message> result = new ArrayList<>();
             Room room = roomRepository.findById(roomId);
             for (Message messageInRoom : room.getMessages()) {
                 if (messageInRoom.getCreatedWhen().isAfter(dateTime)
                         && currentUser != null
-                        && !currentUser.getUsername().equals(messageInRoom.getAuthorName())
+                        // && !currentUser.getUsername().equals(messageInRoom.getAuthorName())
                         && !result.contains(messageInRoom)
                 ) {
                     result.add(messageInRoom);
@@ -110,5 +110,18 @@ public class RoomService {
             return convertToDTO.convertToDTOListOfMessages(result);
         }
 
+    }
+
+    public Collection<MessageDTO> getMessagesAfterId(long roomId, MyUser currentUser, Long lastId) {
+        List<Message> messages = new ArrayList<>();
+        if (lastId != null) {
+            Room room = roomRepository.findById(roomId);
+            for (Message message : room.getMessages()) {
+                if ((message.getId() > lastId) && (!messages.contains(message))) {
+                    messages.add(message);
+                }
+            }
+        }
+        return convertToDTO.convertToDTOListOfMessages(messages);
     }
 }
