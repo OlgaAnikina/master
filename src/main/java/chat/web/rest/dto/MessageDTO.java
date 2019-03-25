@@ -1,17 +1,13 @@
 package chat.web.rest.dto;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-
 public class MessageDTO {
 
     private long id;
     private String text;
     private Long roomId;
     private String authorName;
-    private long createdWhen;
+    //private long createdWhen;
+    private String createdWhen;
 
     public MessageDTO() {
     }
@@ -55,11 +51,11 @@ public class MessageDTO {
         this.roomId = roomId;
     }
 
-    public long getCreatedWhen() {
+    public String getCreatedWhen() {
         return createdWhen;
     }
 
-    public void setCreatedWhen(long createdWhen) {
+    public void setCreatedWhen(String createdWhen) {
         this.createdWhen = createdWhen;
     }
 }

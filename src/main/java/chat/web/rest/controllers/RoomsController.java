@@ -8,12 +8,14 @@ import chat.repositories.RelationRepository;
 import chat.repositories.RoleRepository;
 import chat.repositories.RoomRepository;
 import chat.repositories.UserRepository;
+import chat.services.RoomService;
 import chat.web.rest.dto.ConvertToDTO;
 import chat.web.rest.dto.RoomDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,17 +40,22 @@ public class RoomsController {
     @Autowired
     private RelationRepository relationRepository;
 
+    @Autowired
+    private RoomService roomService;
+
 
     public RoomsController(ConvertToDTO convertToDTO,
                            RoomRepository roomRepository,
                            UserRepository userRepository,
                            RoleRepository roleRepository,
-                           RelationRepository relationRepository) {
+                           RelationRepository relationRepository,
+                           RoomService roomService) {
         this.roomRepository = roomRepository;
         this.convertToDTO = convertToDTO;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.relationRepository = relationRepository;
+        this.roomService = roomService;
 
     }
 
@@ -120,5 +127,34 @@ public class RoomsController {
 
     }
 
+    @GetMapping("/{idLastRoom}")
+    public Collection<RoomDTO> getUsersRoom(@PathVariable("idLastRoom") int idLastRoom,
+            @AuthenticationPrincipal MyUser user) {
+        if ((idLastRoom != 0)&& (user != null)) {
+            List<RoomDTO> usersRoom = roomService.getRooms(user);
+            List<RoomDTO> resultRoom = new ArrayList<>();
+            for (RoomDTO room : usersRoom) {
+                if (room.getId() > idLastRoom) {
+                    resultRoom.add(room);
+                }
+            }
+            return resultRoom;
+        }
+
+       return roomService.getRooms(user);
+    }
+
+    @GetMapping("/checkName/{roomName}")
+    public String checkDuplicateRoomName(@PathVariable("roomName") String roomName,
+                                         @AuthenticationPrincipal MyUser owner) {
+        List<RoomDTO> usersRoom = roomService.getRooms(owner);
+        for(RoomDTO room: usersRoom) {
+            if (room.getName().equals(roomName)) {
+                return "Duplicate room\'s name";
+            }
+        }
+        return "Unique room\'s name";
+
+    }
 
 }

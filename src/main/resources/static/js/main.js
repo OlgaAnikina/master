@@ -64,6 +64,7 @@ Vue.component('message-row', {
         '<div class="list-;group  ">' +
         '<div>{{message.text}}</div>' +
         '<div class="author"><i>{{message.authorName}}</i></div>' +
+        '<div>{{message.createdWhen}}</div>' +
 
         '</div></li></div>' +
 
@@ -72,6 +73,7 @@ Vue.component('message-row', {
         '<div class="list-group ">' +
         '<div>{{message.text}}</div>' +
         '<div class="author"><i>{{message.authorName}}</i></div>' +
+        '<div class="author">{{message.createdWhen}}</div>' +
         '</div></li></div>' +
         '</div>',
     methods: {
@@ -122,14 +124,19 @@ Vue.component('inputForm', {
 Vue.component('modal', {
     props: ['users', 'profile'],
     data: function () {
-        return {
-            checkedUsers: [],
-            roomName: ''
-        }
-    },
+                return {
+                    checkedUsers: [],
+                    roomName: '',
+                    answer: 'Input form is empty'
+
+                }
+            },
     computed: {
         isComplete() {
             return this.roomName && this.checkedUsers;
+        },
+        isNotEmptyName() {
+            return this.roomName;
         }
     },
     template: '<div>' +
@@ -152,11 +159,12 @@ Vue.component('modal', {
         '<div class="mb-3">' +
         '<label for="validationTextarea">Input chat\'s name:</label>' +
         '<input type="text" placeholder="Name of new chat" v-model="roomName"/>' +
+        ' <p>{{ answer }}</p>' +
         '</div>' +
         '<br>' +
         '<div class="card-header">Choose participants to chat:</div>' +
 
-        '<ul class="list-group list-group-flush">' +
+        '<ul class="list-group list-group-flush list-users">' +
         '<li v-for="user in users" class="list-group-item"  >' +
         '{{user.name}}' +
         '<label class="checkbox" >' +
@@ -165,12 +173,9 @@ Vue.component('modal', {
         '</label>\n' +
         '</li></ul>' +
         '<br>' +
-     //   '<span>Отмеченные имена: {{ checkedUsers }}</span>' +
         '</form>' +
         '</slot>' +
         '</section>' +
-
-
         '<footer class="modal-footer">' +
         '<slot name="footer">' +
         '<button type="button" :disabled=\'!isComplete\'  class="btn-primary btn-block mb-2" ' +
@@ -183,7 +188,40 @@ Vue.component('modal', {
         '</div>' +
         '</transition>' +
         '</div>',
+  /*  watch: {
+
+    roomName: function (newRoomName, oldRoomName) {
+        this.answer = 'Input ...'
+        this.debouncedGetAnswer
+    }
+    },
+    created: function () {
+        this.debouncedGetAnswer = this.getAnswer();
+       //this.getAnswer();
+    },*/
     methods: {
+    getAnswer: function () {
+        var vm = this;
+        this.answer = 'Wait...';
+        var checkRoomName = setInterval(() => {
+            if (this.isNotEmptyName) {
+                this.$http.get('/v2/room/checkName/' + this.roomName).then(response => {
+
+                    if (response.body != null) {
+
+                        vm.answer = response.data.answer;
+                        vm.answer = response.body;
+                    }
+
+                }, response => {
+                    vm.answer = 'Can\'t check room\'s name. '
+                });
+
+            }
+        }, 1000)
+
+       },
+
 
         initClose() {
             this.$emit('close')
@@ -253,11 +291,12 @@ Vue.component('addParticipants', {
         '<form class="was-validated">' +
         '<div class="mb-3">' +
         '<div class="card-header"> Users in this chat:</div>' +
+        '<ul class="list-group list-group-flush list-users">' +
         '<div v-for="name in currentRoom.participantsName">' +
-        '<li>{{name}}</li></div>' +
+        '<li>{{name}}</li></div></ul>' +
         '</div>' +
         '<div class="card-header">Choose participants to chat:</div>' +
-        '<ul class="list-group list-group-flush rrr">' +
+        '<ul class="list-group list-group-flush list-users">' +
         '<li v-for="user in users" class="list-group-item" v-if="!currentRoom.participantsName.includes(user.name)"  >' +
         '<div v-if="!currentRoom.participantsName.includes(user.name) ">{{user.name}}' +
         '<label class="checkbox" >' +
@@ -393,7 +432,7 @@ Vue.component('roomsList', {
                         frontendData.messages.pop();
                     }
                     data.messages.forEach(function (item) {
-                        frontendData.messages.push(item);
+                        frontendData.messages.unshift(item);
                     });
                 })
             )
@@ -412,7 +451,7 @@ Vue.component('messagesChat', {
         scrollToEnd() {
             var container = document.getElementById("scroll");
             var scrollHeight = container.scrollHeight;
-            if (scrollHeight > 349 && !container.classList.contains('block-messages')) {
+            if (scrollHeight > 340 && !container.classList.contains('block-messages')) {
                 var d = document.getElementById("scroll");
                 d.className += " block-messages";
             } else if (container.classList.contains('block-messages') && scrollHeight < 350) {
@@ -564,25 +603,73 @@ var app = new Vue({
                 }} else lastId = 0;
             return lastId;
         },
+        idLastRoom() {
+            if (frontendData.usersRooms.length != 0) {
+                var lastRoom = frontendData.usersRooms[0].id;
+                for(var i = 0; i < frontendData.usersRooms.length; i++) {
+                    if(lastRoom < frontendData.usersRooms[i].id) {
+                        lastRoom = frontendData.usersRooms[i].id;
+                    }
+                }
+            }else lastRoom = 0;
+            return lastRoom;
+        },
+        idLastUser() {
+            if (frontendData.users.length != 0) {
+                var lastUser = frontendData.users[0].id;
+                for(var i = 0; i < frontendData.users.length; i++) {
+                    if(lastUser < frontendData.users[i].id) {
+                        lastUser = frontendData.users[i].id;
+                    }
+                }
+            }else lastUser = 0;
+            return lastUser;
+        },
          pollData() {
 
+             if (frontendData.profile != null) {
              var updateMessages = setInterval(() => {
-                // this.$http.get('/v2/rooms/' + frontendData.currentRoomId + '/messages' + '?currentTime=' + time).then(response => {
-                 this.$http.get('/v2/rooms/' + frontendData.currentRoomId + '/messages/' + this.isLastId() /*'?lastId=' + lastId*/).then(response => {
+               this.$http.get('/v2/rooms/' + frontendData.currentRoomId + '/messages/' + this.isLastId() /*'?lastId=' + lastId*/).then(response => {
 
                      response.body.forEach(function (item) {
                          frontendData.messages.push(item);
                      });
-                     console.log(response.body);
 
-                 }, response => {
+                 }, response => {});
 
 
-                 });
+             }, 1000);
+             var updateRooms = setInterval(() => {
+                 this.$http.get('/v2/room/' + this.idLastRoom()).then(response => {
+
+                     if (response.body != null){
+
+                         response.body.forEach(function (item) {
+                             frontendData.usersRooms.push(item);
+                         });
+                     }
+
+                 }, response => {});
+
+
+             }, 1000);
+             var updateUsers = setInterval(() => {
+                 this.$http.get('v2/users/' + this.idLastUser()).then(response => {
+
+                     if (response.body != null){
+
+                         response.body.forEach(function (item) {
+                             frontendData.users.push(item);
+                         });
+                     }
+
+                 }, response => {});
 
 
              }, 1000)
+
          }
+        }
      },
      created() {
          this.pollData();

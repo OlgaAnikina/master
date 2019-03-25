@@ -1,12 +1,14 @@
 package chat.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table
-public class Message {
+public class Message implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
@@ -22,7 +24,8 @@ public class Message {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @Column(name="createdWhen")
+    @Column(name = "createdWhen")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdWhen;
 
     public MyUser getAuthor() {

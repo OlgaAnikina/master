@@ -84,13 +84,15 @@ public class RoomService {
         List<Relation> relations = relationRepository.findAll();
         List<RoomDTO> result = new ArrayList<>();
 
-        for (Relation relation : relations) {
-            if ((relation.getUser().getUsername().equals(owner.getUsername()))
-                    && (relation.getRoom().getType().equals("PUBLIC"))) {
-                result.add(convertToDTO.convertToRoomDTO(relation.getRoom()));
+        if(owner != null) {
+            for (Relation relation : relations) {
+                if ((relation.getUser().getUsername().equals(owner.getUsername()))
+                        && (relation.getRoom().getType().equals("PUBLIC"))) {
+                    result.add(convertToDTO.convertToRoomDTO(relation.getRoom()));
+                }
             }
-        }
-        return result;
+            return result;
+        } return null;
     }
 
 
@@ -124,4 +126,7 @@ public class RoomService {
         }
         return convertToDTO.convertToDTOListOfMessages(messages);
     }
+
+//    public List<Message>
+
 }

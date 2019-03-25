@@ -2,6 +2,8 @@ package chat.services;
 
 import chat.model.MyUser;
 import chat.repositories.UserRepository;
+import chat.web.rest.dto.ConvertToDTO;
+import chat.web.rest.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -19,6 +22,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ConvertToDTO convertToDTO;
+
 
 
     @Override
@@ -51,5 +57,10 @@ public class UserService implements UserDetailsService {
 
         }
         return resultUsers;
+    }
+
+    public Collection<UserDTO> getUsers() {
+        Collection<UserDTO> resultUsers = convertToDTO.convertToDTOListOfUsers(userRepository.findAll());
+       return resultUsers;
     }
 }

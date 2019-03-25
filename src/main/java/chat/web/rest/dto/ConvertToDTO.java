@@ -8,10 +8,7 @@ import chat.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -51,14 +48,22 @@ public class ConvertToDTO {
         messageDTO.setText(message.getText());
         messageDTO.setRoomId(message.getRoom().getId());
         messageDTO.setAuthorName(message.getAuthorName());
-        messageDTO.setCreatedWhen(message.getCreatedWhen().toInstant(ZoneOffset.UTC).getEpochSecond());
+        // messageDTO.setCreatedWhen(message.getCreatedWhen().toInstant(ZoneOffset.UTC).getEpochSecond());
+
+        messageDTO.setCreatedWhen(StringFromat(message.getCreatedWhen()));
         return messageDTO;
+    }
+
+    private String StringFromat(LocalDateTime createdWhen) {
+        String createTime = "" + createdWhen.getHour() +
+                ':' + createdWhen.getMinute() + ':' + createdWhen.getSecond();
+        return createTime;
     }
 
     public Message convertMessage(MessageDTO messageDTO) {
         Message message = new Message();
         message.setText(messageDTO.getText());
-        message.setCreatedWhen(LocalDateTime.ofInstant(Instant.ofEpochMilli(messageDTO.getCreatedWhen()), ZoneId.systemDefault()));
+      //  message.setCreatedWhen(LocalDateTime.ofInstant(Instant.ofEpochMilli(messageDTO.getCreatedWhen()), ZoneId.systemDefault()));
         MyUser author = userRepository.findByUsername(messageDTO.getAuthorName());
         message.setAuthor(author);
 
